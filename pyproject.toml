@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prettier_console" 
+version = "0.1.0"
+description = "Provide you some tool to express construct a prettier_console"
+authors = [{name = "MrCosine", email = "a95sun@uwaterloo.ca"}]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "keyboard>=0.13.5",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourname/cli-tools"
