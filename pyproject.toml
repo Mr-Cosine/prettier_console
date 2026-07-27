@@ -19,4 +19,4 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourname/cli-tools"
+Homepage = "https://github.com/mr-cosine/interactive cli"
