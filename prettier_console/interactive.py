@@ -8,7 +8,7 @@ import subprocess
 import os
 import sys
 import keyboard
-from .ascii_art_font import ascii_art
+from .ascii_art_font import ascii_art_font as ascii_art
 
 #----------------------------------------------------------------------------------------------------------------------------------
 class colored_output:

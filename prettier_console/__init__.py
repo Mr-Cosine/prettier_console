@@ -6,6 +6,7 @@ from .interactive import (
     print_selections,
     print_yesorno,
     menu,
+    home_menu,
     select_files,
     select_folder,
 )

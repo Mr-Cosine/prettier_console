@@ -25,4 +25,4 @@ Homepage = "https://github.com/mr-cosine/prettier_console"
 where = ["."]
 
 [tool.setuptools.package-data]
-prettier_console = ["ascii_art/ascii_font.json"]
+prettier_console = ["ascii_art_font/ascii_font.json"]
