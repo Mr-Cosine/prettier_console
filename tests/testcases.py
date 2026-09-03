@@ -35,7 +35,7 @@ if __name__ == "__main__":
          'func': 
             {
              'body': sub, 
-             'param': [1]
+             'param': [1]   # positional argument
             }
         },
         {
@@ -45,7 +45,7 @@ if __name__ == "__main__":
          'func': 
             {
              'body': sub, 
-             'param': [2]
+             'param': [2]   # positional argument
             }
         }
     ]

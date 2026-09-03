@@ -126,7 +126,7 @@ def safe_input(prompt=""):
 
     while True:
         try:
-            event = keyboard.read_event()
+            event = keyboard.read_event(suppress=True)
             
             if event.event_type == keyboard.KEY_DOWN:
                 if event.name == 'enter':
@@ -230,7 +230,7 @@ def print_selections(prompt, options):
         print_options()
         
         # Get key press
-        key = keyboard.read_event()
+        key = keyboard.read_event(suppress=True)
         
         if key.event_type == keyboard.KEY_DOWN:
             if key.name == 'up':
