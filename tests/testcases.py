@@ -1,4 +1,4 @@
-from interactive import interactive
+from prettier_console import interactive
 import sys
 
 #=================================================================================================

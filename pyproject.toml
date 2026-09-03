@@ -19,7 +19,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/mr-cosine/interactive cli"
+Homepage = "https://github.com/mr-cosine/prettier_console"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
+
+[tool.setuptools.package-data]
+prettier_console = ["ascii_art/ascii_font.json"]

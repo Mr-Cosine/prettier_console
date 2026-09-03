@@ -1,4 +1,4 @@
-from .ascii_art import (
+from .ascii_art_font import (
     get_character,
     list_styles,
     build_display,

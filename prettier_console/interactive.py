@@ -3,11 +3,12 @@ dedicated tools to create interactive UI in command line window
 """
 
 import tkinter
+import tkinter.filedialog 
 import subprocess
 import os
 import sys
 import keyboard
-from .ascii_art import ascii_art
+from .ascii_art_font import ascii_art
 
 #----------------------------------------------------------------------------------------------------------------------------------
 class colored_output:
@@ -154,10 +155,33 @@ def clear_screen():
     subprocess.run(command, shell=True, check=False)
 
 #----------------------------------------------------------------------------------------------------------------------------------
-    
-def print_menu(options):
+
+def print_yesorno(prompt):
     """
-    print menu options could be operated by up and down arrow
+    print yes or no choice to let user select.
+
+    :param prompt:          the prompt displayed before asking.
+
+    :return:                'y' or 'n'
+    """
+    options = [
+        {
+            'text': 'Yes',
+            'color': 'green',
+            'id': 'y'
+        },
+        {
+            'text': 'No',
+            'color': 'red',
+            'id': 'n'
+        }
+    ]
+    return print_selections(prompt, options)
+
+def print_selections(prompt, options):
+
+    """
+    print menu options could be operated by up and down arrow to select. returns the id of the option.
 
     :param options:         dict,       the options for choose
                             {
@@ -176,6 +200,8 @@ def print_menu(options):
     # Calculate max length once for lining up entries
     target_w = max(display_width(str(option['text'])) for option in options)
     target_w = 10 if target_w < 10 else target_w
+
+    print(prompt)
 
     def print_options():
         for idx, option in enumerate(options):
@@ -237,7 +263,7 @@ def menu(name, prompt, options, home=False):
                             ]
     :param home:            boolean,    True if this is the home page
     """
-    # gather the necessary information for print_menu(options)
+    # gather the necessary information for print_selections(options)
     menu_options = [{'text': option['text'], 'color': option.get('color') or None, 'id': option['id']} for option in options]
 
     # add back option to allow to return to previous menu
@@ -254,11 +280,12 @@ def menu(name, prompt, options, home=False):
         else:
             ascii_art.default_print_banner(name)
         print(prompt)
-        print('='*30)
         print()
-        print(f'Choose from the following {len(menu_options)} options:')
 
-        chosen_id = print_menu(menu_options)
+        chosen_id = print_selections(
+            f'Choose from the following {len(menu_options)} options:', 
+            menu_options
+        )
     
         if chosen_id in ['back', 'quit']:
             return chosen_id
@@ -313,22 +340,48 @@ def home_menu(name, prompt, options):
 
 #----------------------------------------------------------------------------------------------------------------------------------
 
-def select_files(file_type):
-    root = tkinter()
+def select_files(prompt, file_types):
+    """
+    opens file selection dialog.
+
+    :param file_types:      [string...]     list of wanted types, eg. ['jpg', 'pdf', 'txt]
+    :param 
+
+    :return:                the selected file location, if not selected return None
+    """
+    root = tkinter.Tk()
     root.withdraw()
+
+    print()
+
+    if isinstance(file_types, str):
+        file_types = [file_types]
+
+    filetypes = []
+    for ft in file_types:
+        ext = ft.lstrip('*.')
+        desc = ext.lower() + ' File'
+        filetypes.append((desc, ft))
+    filetypes.append(('All Files', '*.*'))
+
     files = tkinter.filedialog.askopenfilenames(
-        title=f'File selection: {file_type.upper()} File',
-        filetypes=[(f'{file_type.upper()} File', f'*.{file_type}')]
+        title='File selection',
+        filetypes=filetypes
     )
+
     root.destroy()
-    if files: return files
-    else: return None
+    return files if files else None
 
 #----------------------------------------------------------------------------------------------------------------------------------
 
-def select_folder():
-    root = tkinter()
+def select_folder(prompt):
+    """
+    opens file selection dialog.
+
+    :return:                the selected folder path, if not selected return None
+    """
+    root = tkinter.Tk()
     root.withdraw()
     folder = tkinter.filedialog.askdirectory(title='Folder selection')
     root.destroy()
-    return folder;
+    return folder if folder else None;
