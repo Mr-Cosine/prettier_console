@@ -22,7 +22,8 @@ def _cmd_updatefont(args):
         target_path = os.path.join(font_folder_path, f'{style}.json')
 
         if os.path.exists(target_path):
-            zip_name = f'legacyfont-{style}-{hashlib.md5(f'{datetime.now().timestamp()}'.encode()).hexdigest()}.zip'
+            randID = hashlib.md5(f'{datetime.now().timestamp()}'.encode()).hexdigest()
+            zip_name = f'legacyfont-{style}-{randID}.zip'
             os.makedirs(os.path.join(font_folder_path, "legacy_fonts"), exist_ok=True)
             zip_path = os.path.join(font_folder_path, "legacy_fonts", zip_name)
 

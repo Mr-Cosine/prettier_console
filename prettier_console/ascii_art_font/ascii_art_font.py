@@ -24,9 +24,8 @@ def get_character(char, style):
 
     return output_char
 
-def build_display(input_string, style, delim=None):
-    if len(input_string) < 1: return
-    if delim is None: delim = ''
+def build_display(input_string, style, delim=''):
+    if len(input_string) < 1: input_string = ' '
 
     all_characters = set(input_string.upper())
     cset = {}
