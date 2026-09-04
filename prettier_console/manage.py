@@ -13,26 +13,24 @@ from .ascii_art_font import ascii_art_font
 
 
 def _cmd_updatefont(args):
-    if args.banner:
-        style = 'banner'
-    elif args.header:
-        style = 'header'
-    else:
-        style = args.style or os.path.splitext(os.path.basename(args.change_font))[0]
+    if args.banner: style = 'banner'
+    elif args.header: style = 'header'
+    else: style = args.style if args.style else os.path.splitext(os.path.basename(args.change_font))[0]
 
     try:
         font_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ascii_art_font', 'font')
         target_path = os.path.join(font_folder_path, f'{style}.json')
 
         if os.path.exists(target_path):
-            rand_id = hashlib.md5(f'{datetime.now().timestamp()}'.encode()).hexdigest()
-            zip_name = f'legacyfont-{style}-{rand_id}.zip'
-            with zipfile.ZipFile(os.path.join(font_folder_path, zip_name), 'w', zipfile.ZIP_DEFLATED) as zipf:
+            zip_name = f'legacyfont-{style}-{hashlib.md5(f'{datetime.now().timestamp()}'.encode()).hexdigest()}.zip'
+            os.makedirs(os.path.join(font_folder_path, "legacy_fonts"), exist_ok=True)
+            zip_path = os.path.join(font_folder_path, "legacy_fonts", zip_name)
+
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
                 zipf.write(target_path, arcname=f'{style}.json')
-            print(f'Existing {style} font backed up to: {os.path.join(font_folder_path, zip_name)}')
 
         ascii_art_font.set_cset(style, args.change_font)
-        print(f'Font updated: {style}')
+        print(f'Font updated.')
     except Exception as e:
         print(f'Error: {e}', file=sys.stderr)
         sys.exit(1)
