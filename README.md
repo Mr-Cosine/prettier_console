@@ -6,3 +6,9 @@ What you can do:
 2. draw ascii-art banners and headers
 3. get colored outputs
 
+dependencies:
+build==1.5.0
+colorama==0.4.6
+keyboard==0.13.5
+packaging==26.2
+pyproject_hooks==1.2.0
