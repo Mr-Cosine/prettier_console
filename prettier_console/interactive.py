@@ -61,7 +61,7 @@ class colored_output:
         if not codes: return ""
         return f"\033[{';'.join(codes)}m"
 
-    def print(self, *objects, color=None, background=None, sep=' ', end='\n', file=None, flush=False):
+    def print(self, *objects, color="white", background=None, sep=' ', end='\n', file=None, flush=False):
         """
         print out colored content
 
@@ -76,18 +76,6 @@ class colored_output:
         text = sep.join(str(obj) for obj in objects)
         colored_text = f"{self._get_escape(color, background)}{text}{self._RESET}"
         print(colored_text, end=end, file=file, flush=flush)
-
-    def print_yn(self, end='\n', file=None, flush=False):
-        """
-        preset colored yes or no option 
-
-        :param end:         string,     ending style (default: new line)
-        :param file:        any,        output stream
-        :param flush:       boolean,    flush buffer zone
-        """
-        y = f"{self._get_escape(fg_color='GREEN')}Yes{self._RESET}"
-        n = f"{self._get_escape(fg_color='RED')}No{self._RESET}"
-        print(f"({y}/{n})", end=end, file=file, flush=flush)
 
     def get_print_string_text(self, *objects, sep=' ', color=None, background=None):
         """
