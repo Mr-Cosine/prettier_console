@@ -291,9 +291,9 @@ def menu(name, prompt, options, home=False):
     while True:
         clear_screen()
         if not home:
-            ascii_art.default_print_header(name)
+            print_header(name)
         else:
-            ascii_art.default_print_banner(name)
+            print_banner(name)
         if not callable(prompt): default_colored_output.print(prompt, color='white')
         else: default_colored_output.print(prompt(), color='white')
         print()
