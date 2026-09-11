@@ -2,9 +2,10 @@ So yea some shortcuts for you to get a prettier interactive console. Um I think 
 Will update this readme later on... I guess.
 
 What you can do:
-1. using interactive.menu() to create menus with selections
-2. draw ascii-art banners and headers
-3. get colored outputs
+1. using interactive.menu() to create menus with single selections
+2. Customize your page by inserting interactive parts using tools such as print_selections and print_yesorno.
+3. draw ascii-art banners and headers
+4. get colored outputs
 
 dependencies:
 build==1.5.0
