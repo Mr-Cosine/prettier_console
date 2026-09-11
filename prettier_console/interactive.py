@@ -12,6 +12,10 @@ from .ascii_art_font import ascii_art_font as ascii_art
 
 #----------------------------------------------------------------------------------------------------------------------------------
 class colored_output:
+    """
+    Colors: black, red, green, yellow, blue, magenta, cyan, white.
+    """
+
     _NORMAL_FG = {
         'BLACK': 30, 'RED': 31, 'GREEN': 32, 'YELLOW': 33,
         'BLUE': 34, 'MAGENTA': 35, 'CYAN': 36, 'WHITE': 37
@@ -160,9 +164,9 @@ def print_yesorno(prompt):
     """
     print yes or no choice to let user select.
 
-    :param prompt:          the prompt displayed before asking.
+    :param prompt:          string/func,    the prompt displayed before asking.
 
-    :return:                'y' or 'n'
+    :return:                string,         'y' or 'n'
     """
     options = [
         {
@@ -183,7 +187,8 @@ def print_selections(prompt, options):
     """
     print menu options could be operated by up and down arrow to select. returns the id of the option.
 
-    :param options:         dict,       the options for choose
+    :param prompt"          string/func,    the prompt string or prompt builder function(need to return string)
+    :param options:         dict,           the options for choose
                             {
                                 text:   string,     the option text displayed
                                 color:  string,     color of the option displayed(default: white)
@@ -201,7 +206,8 @@ def print_selections(prompt, options):
     target_w = max(display_width(str(option['text'])) for option in options)
     target_w = 10 if target_w < 10 else target_w
 
-    print(prompt)
+    if not callable(prompt): print(prompt)
+    else: print(prompt())
 
     def print_options():
         for idx, option in enumerate(options):
@@ -246,9 +252,9 @@ def menu(name, prompt, options, home=False):
     """
     open up a menu with single selection toward other menu
 
-    :param name:            string,     the name of the panel
-    :param prompt:          string,     the prompt
-    :param options:         [dict...],  the options informations
+    :param name:            string,         the name of the panel
+    :param prompt:          string/func,    the prompt pr a prompt builder function(need to return string)
+    :param options:         [dict],         the options informations
                             [
                                 {
                                 text:   string, 
@@ -261,7 +267,6 @@ def menu(name, prompt, options, home=False):
                                 }
                                 ...
                             ]
-    :param home:            boolean,    True if this is the home page
     """
     # gather the necessary information for print_selections(options)
     menu_options = [{'text': option['text'], 'color': option.get('color') or None, 'id': option['id']} for option in options]
@@ -279,7 +284,8 @@ def menu(name, prompt, options, home=False):
             ascii_art.default_print_header(name)
         else:
             ascii_art.default_print_banner(name)
-        print(prompt)
+        if not callable(prompt): print(prompt)
+        else: print(prompt())
         print()
 
         chosen_id = print_selections(
@@ -340,11 +346,11 @@ def home_menu(name, prompt, options):
 
 #----------------------------------------------------------------------------------------------------------------------------------
 
-def select_files(prompt, file_types):
+def select_files(file_types):
     """
     opens file selection dialog.
 
-    :param file_types:      [string...]     list of wanted types, eg. ['jpg', 'pdf', 'txt]
+    :param file_types:      [string...],    list of wanted types, eg. ['jpg', 'pdf', 'txt]
     :param 
 
     :return:                the selected file location, if not selected return None
@@ -374,7 +380,7 @@ def select_files(prompt, file_types):
 
 #----------------------------------------------------------------------------------------------------------------------------------
 
-def select_folder(prompt):
+def select_folder():
     """
     opens file selection dialog.
 
