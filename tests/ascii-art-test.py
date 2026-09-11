@@ -1,5 +1,7 @@
-import prettier_console
-from prettier_console import ascii_art_font
+import prettier_console as pc
 
-ascii_art_font.default_print_banner('quick brown fox\njumps over the\nlazy dog')
-ascii_art_font.default_print_header('quick brown fox jumps over the lazy dog')
+pc.print_banner('quick brown fox\njumps over the\nlazy dog', color="white")
+pc.print_header('quick brown fox jumps over the lazy dog', color="white")
+
+pc.print_banner('quick brown fox\njumps over the\nlazy dog', color="red")
+pc.print_header('quick brown fox jumps over the lazy dog', color="blue")

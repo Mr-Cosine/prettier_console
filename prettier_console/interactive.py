@@ -102,6 +102,9 @@ class colored_output:
         escape = self._get_escape(color, background)
         return f"{escape}{text}{self._RESET}"
 
+# shared instance used for every output of this module
+default_colored_output = colored_output(bright=False)
+
 #----------------------------------------------------------------------------------------------------------------------------------
 def display_width(text):
     """
@@ -124,7 +127,7 @@ def safe_input(prompt=""):
 
     :param prompt:          string,     text displayed before asking for input
     """
-    if prompt: print(prompt, end='', flush=True)
+    if prompt: default_colored_output.print(prompt, color='white', end='', flush=True)
 
     result = []
 
@@ -142,10 +145,10 @@ def safe_input(prompt=""):
                         print('\b \b', end='', flush=True)
                 elif event.name == 'space':
                     result.append(' ')
-                    print(' ', end='', flush=True)
+                    default_colored_output.print(' ', color='white', end='', flush=True)
                 elif len(event.name) == 1:
                     result.append(event.name)
-                    print(event.name, end='', flush=True)
+                    default_colored_output.print(event.name, color='white', end='', flush=True)
         except:
             return input()
 
@@ -157,6 +160,27 @@ def clear_screen():
     """
     command = 'cls' if os.name == 'nt' else 'clear'
     subprocess.run(command, shell=True, check=False)
+
+#----------------------------------------------------------------------------------------------------------------------------------
+
+def print_banner(input_string, color='white'):
+    """
+    print a text rendered in the banner ascii-art style.
+
+    :param input_string:    string,     the text to render, '\\n' splits it into rows
+    :param color:           string,     text color (default: white)
+    """
+    default_colored_output.print(ascii_art.default_banner(input_string), color=color, background=None)
+
+def print_header(input_string, color='white'):
+    """
+    print a text rendered in the header ascii-art style.
+
+    :param input_string:    string,     the text to render, '\\n' splits it into rows
+    :param color:           string,     text color (default: white)
+    """
+
+    default_colored_output.print(ascii_art.default_header(input_string), color=color, background=None)
 
 #----------------------------------------------------------------------------------------------------------------------------------
 
@@ -198,16 +222,14 @@ def print_selections(prompt, options):
     def hide_cursor(): print('\033[?25l', end='', flush=True)
     def show_cursor(): print('\033[?25h', end='', flush=True)
 
-    colored_out = colored_output(bright=False)
-
     active_index = 0
-    
+
     # Calculate max length once for lining up entries
     target_w = max(display_width(str(option['text'])) for option in options)
     target_w = 10 if target_w < 10 else target_w
 
-    if not callable(prompt): print(prompt)
-    else: print(prompt())
+    if not callable(prompt): default_colored_output.print(prompt, color='white')
+    else: default_colored_output.print(prompt(), color='white')
 
     def print_options():
         for idx, option in enumerate(options):
@@ -215,15 +237,15 @@ def print_selections(prompt, options):
             lag_cursor = "·<" if idx == active_index else " "
 
             text = option['text']
-            color = option['color']
+            color = option.get('color') or 'white'
 
             current_w = display_width(text)
             filler = ('·' if active_index == idx else " ") * (max((target_w - current_w), 0) + 4 - display_width(lead_cursor))
 
-            print(' '*(4 - display_width(lead_cursor)), end='', flush=True)
-            colored_out.print(f"{lead_cursor}", color='white', end='', flush=True)
-            colored_out.print(f"{idx+1}.{text}", color=color, end='', flush=True)
-            colored_out.print(f"{filler}{lag_cursor}", color='white', flush=True)
+            default_colored_output.print(' '*(4 - display_width(lead_cursor)), color='white', end='', flush=True)
+            default_colored_output.print(f"{lead_cursor}", color='white', end='', flush=True)
+            default_colored_output.print(f"{idx+1}.{text}", color=color, end='', flush=True)
+            default_colored_output.print(f"{filler}{lag_cursor}", color='white', flush=True)
 
     hide_cursor()
     # Print menu
@@ -284,8 +306,8 @@ def menu(name, prompt, options, home=False):
             ascii_art.default_print_header(name)
         else:
             ascii_art.default_print_banner(name)
-        if not callable(prompt): print(prompt)
-        else: print(prompt())
+        if not callable(prompt): default_colored_output.print(prompt, color='white')
+        else: default_colored_output.print(prompt(), color='white')
         print()
 
         chosen_id = print_selections(
@@ -340,8 +362,8 @@ def home_menu(name, prompt, options):
     result = menu(name, prompt, options, home=True)
     if result == 'quit':
         clear_screen()
-        print("Exiting program.")
-        print('='*30)
+        default_colored_output.print("Exiting program.", color='white')
+        default_colored_output.print('='*30, color='white')
         sys.exit(0)
 
 #----------------------------------------------------------------------------------------------------------------------------------

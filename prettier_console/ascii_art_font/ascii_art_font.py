@@ -90,16 +90,39 @@ def set_cset(style, font_path):
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
-def default_print_banner(input_string):
-    parsed = input_string.split('\n')
-    for line in parsed:
-        display_content, length = build_display(line, 'banner', delim=' ')
-        print(display_content)
-    print('='*length)
+def _build_default_display(input_string, style):
+    """
+    build the rendered content of a default style, underlined by a separator.
 
-def default_print_header(input_string):
-    parsed = input_string.split('\n')
-    for line in parsed:
-        display_content, length = build_display(line, 'header', delim=' ')
-        print(display_content)
-    print('='*length)
+    :param input_string:    string,     the text to render, '\\n' splits it into rows
+    :param style:           string,     the font style to render with
+
+    :return:                string,     the rendered content, rows joined by '\\n'
+    """
+    lines = []
+    length = 0
+    for line in input_string.split('\n'):
+        display_content, length = build_display(line, style, delim=' ')
+        lines.append(display_content)
+    lines.append('='*length)
+    return '\n'.join(lines)
+
+def default_banner(input_string):
+    """
+    build the banner content.
+
+    :param input_string:    string,     the text to render
+
+    :return:                string,     the rendered banner content
+    """
+    return _build_default_display(input_string, 'banner')
+
+def default_header(input_string):
+    """
+    build the header content.
+
+    :param input_string:    string,     the text to render
+
+    :return:                string,     the rendered header content
+    """
+    return _build_default_display(input_string, 'header')
