@@ -1,2 +1,0 @@
-[console_scripts]
-prettier_console = prettier_console.manage:main
