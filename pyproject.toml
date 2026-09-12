@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "prettier_console" 
 version = "0.1.0"
-description = "Provide you a automation to construct a prettier interactive console in one call"
+description = "Provide you an automation to construct a prettier interactive console in one call"
 authors = [{name = "MrCosine", email = "a95sun@uwaterloo.ca"}]
 license = {text = "MIT"}
 readme = "README.md"

@@ -2,8 +2,6 @@
 dedicated tools to create interactive UI in command line window
 """
 
-import tkinter
-import tkinter.filedialog 
 import subprocess
 import os
 import sys
@@ -177,11 +175,13 @@ def select_files(file_types):
     opens file selection dialog.
 
     :param file_types:      [string...],    list of wanted types, eg. ['jpg', 'pdf', 'txt]
-    :param 
 
     :return:                the selected file location, if not selected return None
     """
-    root = tkinter.Tk()
+    from tkinter import Tk
+    import tkinter.filedialog
+
+    root = Tk()
     root.withdraw()
 
     print()
@@ -212,7 +212,10 @@ def select_folder():
 
     :return:                the selected folder path, if not selected return None
     """
-    root = tkinter.Tk()
+    from tkinter import Tk
+    import tkinter.filedialog 
+
+    root = Tk()
     root.withdraw()
     folder = tkinter.filedialog.askdirectory(title='Folder selection')
     root.destroy()
@@ -247,7 +250,7 @@ def print_selections(prompt, options):
     """
     print menu options could be operated by up and down arrow to select. returns the id of the option.
 
-    :param prompt"          string/func,    the prompt string or prompt builder function(need to return string)
+    :param prompt:          string/func,    the prompt string or prompt builder function(need to return string)
     :param options:         dict,           the options for choose
                             {
                                 text:   string,     the option text displayed
@@ -306,7 +309,7 @@ def print_selections(prompt, options):
                 return options[active_index]['id']
             else: continue
 
-def menu(name, prompt, options, home=False):
+def menu(name, prompt, options=None, home=False):
     """
     open up a menu with single selection toward other menu
 
@@ -327,6 +330,7 @@ def menu(name, prompt, options, home=False):
                             ]
     """
     # gather the necessary information for print_selections(options)
+    if options is None: options = []
     menu_options = [{'text': option['text'], 'color': option.get('color') or None, 'id': option['id']} for option in options]
 
     # add back option to allow to return to previous menu
@@ -375,7 +379,7 @@ def menu(name, prompt, options, home=False):
             if result == 'quit':
                 return result
 
-def home_menu(name, prompt, options):
+def home_menu(name, prompt, options=None):
     """
     open a root menu with single selection toward other menu
 
