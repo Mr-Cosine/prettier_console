@@ -216,4 +216,4 @@ The previous version of a style is automatically zipped into `font/legacy_fonts/
 
 ## Worth noticing
 
-When running, do not resize the window of powershell. Otherwise the formatting would break
+When running, do not resize the window of powershell. Otherwise the formatting would break.
