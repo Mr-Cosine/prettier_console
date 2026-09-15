@@ -41,7 +41,7 @@ def build_display(input_string, style, delim=''):
     width = len(lines[0]) if lines else 0
     return '\n'.join(lines), width
         
-def parse_font_file(path):
+def parse_font_file(path, sep):
     """
     parse a text file into a character set dictionary for a font style.
 
@@ -58,14 +58,14 @@ def parse_font_file(path):
     if len(lines) == 0:
         raise Exception('Font file error: file is empty')
 
-    characters = list(string.ascii_uppercase) + [' ']
+    characters = [c for c in string.ascii_uppercase] + [' ']
     cset = {character: {} for character in characters}
 
     for i, line in enumerate(lines):
-        segments = line.split('/')
+        segments = line.split(sep=sep)
         if len(segments) != len(characters):
             raise Exception(
-                f"Font file error: line {i + 1} has {len(segments)} '/'-separated segments, "
+                f"Font file error: line {i + 1} has {len(segments)} {sep}-separated segments, "
                 f'expected {len(characters)} (A-Z + space).'
             )
         for character, segment in zip(characters, segments):
@@ -73,7 +73,7 @@ def parse_font_file(path):
 
     return cset
 
-def set_cset(style, font_path):
+def set_cset(style, font_path, sep):
     """
     parse a font text file and add or replace a style under ascii_art_font/font/.
 
@@ -85,7 +85,7 @@ def set_cset(style, font_path):
     os.makedirs(font_dir, exist_ok=True)
     json_path = os.path.join(font_dir, f'{style}.json')
 
-    data = parse_font_file(font_path)
+    data = parse_font_file(font_path, sep)
 
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
