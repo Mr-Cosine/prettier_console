@@ -8,6 +8,7 @@ from datetime import datetime
 import argparse
 import os
 import sys
+import string
 
 from .ascii_art_font import ascii_art_font
 
@@ -42,6 +43,11 @@ def _cmd_updatefont(args):
 def single_char(value):
     if len(value) != 1:
         raise argparse.ArgumentTypeError("Value must be a single character.")
+    return value
+
+def file_name(value):
+    if any(c not in string.ascii_letters or c not in '1234567890' for c in value):
+        raise argparse.ArgumentTypeError("Cannot include non alphanumerical character in style name")
     return value
 
 def main():
