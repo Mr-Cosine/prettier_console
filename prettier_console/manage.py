@@ -45,7 +45,7 @@ def single_char(value):
         raise argparse.ArgumentTypeError("Value must be a single character.")
     return value
 
-def file_name(value):
+def style_name(value):
     if any(c not in string.ascii_letters or c not in '1234567890' for c in value):
         raise argparse.ArgumentTypeError("Cannot include non alphanumerical character in style name")
     return value
@@ -66,7 +66,7 @@ def main():
     target.add_argument('--sep', type=single_char, help='separator between characters')
     target.add_argument('--banner', action='store_true', help='save as the banner style')
     target.add_argument('--header', action='store_true', help='save as the header style')
-    target.add_argument('--style', help='style name to save as (default: the file name without extension)')
+    target.add_argument('--style', type=style_name, help='style name to save as (default: the file name without extension)')
     updatefont.set_defaults(func=_cmd_updatefont)
 
     args = parser.parse_args()
