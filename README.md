@@ -200,12 +200,13 @@ The previous version of a style is automatically zipped into `font/legacy_fonts/
 | Function | Description |
 |---|---|
 | `colored_output(bright=False)` | Class for producing ANSI-colored output. |
-| `default_colored_output` | Shared `colored_output` instance used throughout the module. |
 | `display_width(text)` | Display width of a string, counting CJK characters as 2. |
 | `safe_input(prompt="")` | `input()` replacement resilient to buffered keypresses. |
 | `clear_screen()` | Clears the terminal, cross-platform. |
-| `select_files(file_types)` | Native file-open dialog; returns selected paths or `None`. |
-| `select_folder()` | Native folder-select dialog; returns a path or `None`. |
+| `select_files(prompt, file_types=)` | Native file-open dialog with prompt, result echoing, and reselection; returns selected paths or `None`. |
+| `select_folder(prompt)` | Native folder-select dialog with prompt, result echoing, and reselection; returns a path or `None`. |
+| `select_files_window(file_types)` | Opens native file-open dialog; returns selected paths or `None`. |
+| `select_folder_window()` | Opens native folder-select dialog; returns a path or `None`. |
 | `print_yesorno(prompt)` | Arrow-key Yes/No prompt; returns `'y'` or `'n'`. |
 | `print_selections(prompt, options)` | Arrow-key single-select prompt; returns the chosen option's `id`. |
 | `print_banner(text, color="white")` | Prints large ASCII-art banner text. |
@@ -214,6 +215,14 @@ The previous version of a style is automatically zipped into `font/legacy_fonts/
 | `home_menu(name, prompt, options=None)` | Entry-point menu; quits the program via `quit_program()`. |
 | `quit_program(code=0)` | Clears the screen, prints a goodbye message, exits. |
 
+## Instances comes with the module
+
+| Instance | Description |
+|---|---|
+| `default_colored_output` | Shared `colored_output` instance, for using the functions without having to instantiate `colored_output`. |
+| `line_counter` | Built-in line counter that `default_colored_output` can mutate automatically to track how many lines are printed (notice: normal print does not count) |
+
 ## Worth noticing
 
 When running, do not resize the window of powershell. Otherwise the formatting would break.
+Avoid having wrapped text. The line_counter does not work well with wrapped text.

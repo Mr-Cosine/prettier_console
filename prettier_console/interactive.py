@@ -148,8 +148,10 @@ def clear_screen():
     """
     flush content on the console
     """
+    global line_counter
     command = 'cls' if os.name == 'nt' else 'clear'
     subprocess.run(command, shell=True, check=False)
+    line_counter = 0
 
 def clear_lines(line_num):
     """
@@ -459,6 +461,7 @@ def select_files(prompt="select file(s)", file_types=None):
     create input, verification, and provide reselect for folder selection.
 
     :param prompt:          string,         format is provided, no need for semicolon etc.
+    :param file_types:      [string]        the types of files wanted, passing None or leaving as blank is any file types
     :return:                the selected folder path, if not selected return None
     """
 
