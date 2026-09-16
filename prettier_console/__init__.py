@@ -1,9 +1,13 @@
 from .interactive import (
     colored_output,
     default_colored_output,
+    line_counter,
     display_width,
     safe_input,
     clear_screen,
+    clear_lines,
+    select_files_window,
+    select_folder_window,
     select_files,
     select_folder,
     print_selections,

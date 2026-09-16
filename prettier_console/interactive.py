@@ -8,7 +8,45 @@ import sys
 import keyboard
 from .ascii_art_font import ascii_art_font as ascii_art
 
+line_counter = 0
+
+# ---------------------------------------------------------------------------------------------------------------------------------- 
+# INPUT
+
+def safe_input(prompt=""):
+    """
+    input with preventions of previous input buffer overflow
+
+    :param prompt:          string,     text displayed before asking for input
+    """
+    if prompt: default_colored_output.print(prompt, color='white', end='', flush=True)
+
+    result = []
+
+    while True:
+        try:
+            event = keyboard.read_event(suppress=True)
+            
+            if event.event_type == keyboard.KEY_DOWN:
+                if event.name == 'enter':
+                    default_colored_output.print()
+                    return ''.join(result)
+                elif event.name == 'backspace':
+                    if result:
+                        result.pop()
+                        print('\b \b', end='', flush=True)
+                elif event.name == 'space':
+                    result.append(' ')
+                    default_colored_output.print(' ', color='white', end='', flush=True)
+                elif len(event.name) == 1:
+                    result.append(event.name)
+                    default_colored_output.print(event.name, color='white', end='', flush=True)
+        except:
+            return input()
+
 #----------------------------------------------------------------------------------------------------------------------------------
+# OUTPUT GADGETS
+
 class colored_output:
     """
     Colors: black, red, green, yellow, blue, magenta, cyan, white.
@@ -74,6 +112,8 @@ class colored_output:
         text = sep.join(str(obj) for obj in objects)
         colored_text = f"{self._get_escape(color, background)}{text}{self._RESET}"
         print(colored_text, end=end, file=file, flush=flush)
+        global line_counter
+        if file is None or file is sys.stdout: line_counter += (text + end).count('\n')
 
     def get_print_string_text(self, *objects, sep=' ', color=None, background=None):
         """
@@ -87,11 +127,9 @@ class colored_output:
         text = sep.join(str(obj) for obj in objects)
         escape = self._get_escape(color, background)
         return f"{escape}{text}{self._RESET}"
+    
+default_colored_output = colored_output(bright=False) # shared instance used for every output of this module
 
-# shared instance used for every output of this module
-default_colored_output = colored_output(bright=False)
-
-#----------------------------------------------------------------------------------------------------------------------------------
 def display_width(text):
     """
     get consistent displayed width for latin + chinese characters string
@@ -105,41 +143,7 @@ def display_width(text):
         else:
             width += 1
     return width
-
-#---------------------------------------------------------------------------------------------------------------------------------- 
-def safe_input(prompt=""):
-    """
-    input with preventions of previous input buffer overflow
-
-    :param prompt:          string,     text displayed before asking for input
-    """
-    if prompt: default_colored_output.print(prompt, color='white', end='', flush=True)
-
-    result = []
-
-    while True:
-        try:
-            event = keyboard.read_event(suppress=True)
-            
-            if event.event_type == keyboard.KEY_DOWN:
-                if event.name == 'enter':
-                    print()
-                    return ''.join(result)
-                elif event.name == 'backspace':
-                    if result:
-                        result.pop()
-                        print('\b \b', end='', flush=True)
-                elif event.name == 'space':
-                    result.append(' ')
-                    default_colored_output.print(' ', color='white', end='', flush=True)
-                elif len(event.name) == 1:
-                    result.append(event.name)
-                    default_colored_output.print(event.name, color='white', end='', flush=True)
-        except:
-            return input()
-
-#----------------------------------------------------------------------------------------------------------------------------------
-
+        
 def clear_screen():
     """
     flush content on the console
@@ -147,16 +151,16 @@ def clear_screen():
     command = 'cls' if os.name == 'nt' else 'clear'
     subprocess.run(command, shell=True, check=False)
 
-#----------------------------------------------------------------------------------------------------------------------------------
-
-def print_banner(input_string, color='white'):
+def clear_lines(line_num):
     """
-    print a text rendered in the banner ascii-art style.
+    flush content between the line of the latest print (inclusive) to a given number of previous print line
 
-    :param input_string:    string,     the text to render, '\\n' splits it into rows
-    :param color:           string,     text color (default: white)
+    :param line_num:        int,        the number of lines to be flushed
     """
-    default_colored_output.print(ascii_art.default_banner(input_string), color=color, background=None)
+    global line_counter
+    if line_num <= 0: return
+    print(f"\033[{line_num}A\033[0J", end="", flush=True)
+    line_counter = max(0, line_counter - line_num)
 
 def print_header(input_string, color='white'):
     """
@@ -168,60 +172,15 @@ def print_header(input_string, color='white'):
 
     default_colored_output.print(ascii_art.default_header(input_string), color=color, background=None)
 
-#----------------------------------------------------------------------------------------------------------------------------------
-
-def select_files(file_types):
+def print_banner(input_string, color='white'):
     """
-    opens file selection dialog.
+    print a text rendered in the banner ascii-art style.
 
-    :param file_types:      [string...],    list of wanted types, eg. ['jpg', 'pdf', 'txt]
-
-    :return:                the selected file location, if not selected return None
+    :param input_string:    string,     the text to render, '\\n' splits it into rows
+    :param color:           string,     text color (default: white)
     """
-    from tkinter import Tk
-    import tkinter.filedialog
 
-    root = Tk()
-    root.withdraw()
-
-    print()
-
-    if isinstance(file_types, str):
-        file_types = [file_types]
-
-    filetypes = []
-    for ft in file_types:
-        ext = ft.lstrip('*.')
-        desc = ext.lower() + ' File'
-        filetypes.append((desc, ft))
-    filetypes.append(('All Files', '*.*'))
-
-    files = tkinter.filedialog.askopenfilenames(
-        title='File selection',
-        filetypes=filetypes
-    )
-
-    root.destroy()
-    return files if files else None
-
-#----------------------------------------------------------------------------------------------------------------------------------
-
-def select_folder():
-    """
-    opens file selection dialog.
-
-    :return:                the selected folder path, if not selected return None
-    """
-    from tkinter import Tk
-    import tkinter.filedialog 
-
-    root = Tk()
-    root.withdraw()
-    folder = tkinter.filedialog.askdirectory(title='Folder selection')
-    root.destroy()
-    return folder if folder else None;
-
-#----------------------------------------------------------------------------------------------------------------------------------
+    default_colored_output.print(ascii_art.default_banner(input_string), color=color, background=None)
 
 def print_yesorno(prompt):
     """
@@ -292,13 +251,9 @@ def print_selections(prompt, options):
 
     # Main loop for arrow key navigation
     while True:
-        # Move cursor up to redraw menu
-        print(f"\033[{len(options) + 1}A", flush=True)
-        print_options()
-        
         # Get key press
         key = keyboard.read_event(suppress=True)
-        
+
         if key.event_type == keyboard.KEY_DOWN:
             if key.name == 'up':
                 active_index = (active_index - 1) % len(options)
@@ -306,8 +261,16 @@ def print_selections(prompt, options):
                 active_index = (active_index + 1) % len(options)
             elif key.name == 'enter':
                 show_cursor()
+                clear_lines(len(options) + 1)   # the options plus the prompt printed above them
                 return options[active_index]['id']
             else: continue
+
+            # only the option lines are redrawn, the prompt above them stays where it is
+            clear_lines(len(options))
+            print_options()
+
+# ----------------------------------------------------------------------------------------------------------------------------------
+# OUTPUT BUNDLES
 
 def menu(name, prompt, options=None, home=False):
     """
@@ -348,7 +311,7 @@ def menu(name, prompt, options=None, home=False):
             print_banner(name)
         if not callable(prompt): default_colored_output.print(prompt, color='white')
         else: default_colored_output.print(prompt(), color='white')
-        print()
+        default_colored_output.print()
 
         chosen_id = print_selections(
             f'Choose from the following {len(menu_options)} options:', 
@@ -402,6 +365,9 @@ def home_menu(name, prompt, options=None):
     result = menu(name, prompt, options, home=True)
     if result == 'quit': quit_program(0)
 
+# ----------------------------------------------------------------------------------------------------------------------------------
+# PROGRAM EXIT
+
 def quit_program(code: int = 0):
     clear_screen()
     default_colored_output.print("Exiting program.", color='white')
@@ -410,3 +376,105 @@ def quit_program(code: int = 0):
     try: keyboard.unhook_all()
     except: pass
     finally: sys.exit(code)
+
+# ----------------------------------------------------------------------------------------------------------------------------------
+# FILE SYSTEM
+
+def select_files_window(file_types):
+    """
+    opens file selection dialog.
+
+    :param file_types:      [string...],    list of wanted types, eg. ['jpg', 'pdf', 'txt]
+
+    :return:                the selected file location, if not selected return None
+    """
+    from tkinter import Tk
+    import tkinter.filedialog
+
+    root = Tk()
+    root.withdraw()
+
+    filetypes = []
+    if file_types is None: filetypes.append(('All Files', '*.*'))
+    else:
+        if isinstance(file_types, str): file_types = [file_types]
+
+        for file_type in file_types:
+            ext = str(file_type).lstrip('*').lstrip('.').lower()
+            # tkinter only matches a pattern, so a bare 'jpg' has to become '*.jpg'
+            if ext in ('', '*'): filetypes.append(('All Files', '*.*'))
+            else: filetypes.append((ext + ' file', '*.' + ext))
+
+    files = tkinter.filedialog.askopenfilenames(
+        title='File selection',
+        filetypes=filetypes
+    )
+
+    root.destroy()
+    return files if files else None
+
+def select_folder_window():
+    """
+    opens file selection dialog.
+
+    :return:                the selected folder path, if not selected return None
+    """
+    from tkinter import Tk
+    import tkinter.filedialog 
+
+    root = Tk()
+    root.withdraw()
+    folder = tkinter.filedialog.askdirectory(title='Folder selection')
+    root.destroy()
+    return folder if folder else None;
+
+def select_folder(prompt="select folder"):
+    """
+    create input, verification, and provide reselect for folder selection.
+
+    :param prompt:          string,         format is provided, no need for semicolon etc.
+    :return:                the selected folder path, if not selected return None
+    """
+
+    global line_counter
+    while True:
+        line_counter = 0
+        default_colored_output.print(prompt, color="white", end=": ")
+        folder = select_folder_window()
+        if folder is not None:
+            # a folder is a single path string, joining it would split it into characters
+            default_colored_output.print((folder[:30] + "...") if len(folder) > 30 else folder)
+            answer = print_yesorno("Is this correct?")
+            if answer == 'y':
+                return folder
+            else:
+                clear_lines(line_counter)
+        else:
+            default_colored_output.print("Selection aborted.")
+            return None
+
+
+def select_files(prompt="select file(s)", file_types=None):
+    """
+    create input, verification, and provide reselect for folder selection.
+
+    :param prompt:          string,         format is provided, no need for semicolon etc.
+    :return:                the selected folder path, if not selected return None
+    """
+
+    global line_counter
+    while True:
+        line_counter = 0
+        default_colored_output.print(prompt, color="white", end=": ")
+        files = select_files_window(file_types)
+        if files is not None:
+            preview = ", ".join(files)
+            default_colored_output.print((preview[:30] + "...") if len(preview) > 30 else preview)
+            answer = print_yesorno("Is this correct?")
+            if answer == 'y':
+                return files
+            else:
+                clear_lines(line_counter)
+        else:
+            default_colored_output.print("Selection aborted.")
+            return None
