@@ -8,7 +8,7 @@ Interactive, colorized command-line UI toolkit for Python — arrow-key menus, A
 pip install prettier-console
 ```
 
-**Requirements:** Python 3.8+, and the [`keyboard`](https://pypi.org/project/keyboard/) package (used for arrow-key navigation and `safe_input`, will be installed with the package). On Linux, reading keyboard events usually requires running with `sudo` or granting input-group permissions.
+**Requirements:** Python 3.10+, and the [`keyboard`](https://pypi.org/project/keyboard/) package (used for arrow-key navigation and `safe_input`, will be installed with the package). On Linux, reading keyboard events usually requires running with `sudo` or granting input-group permissions.
 
 ## Quickstart
 
