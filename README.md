@@ -171,8 +171,11 @@ A drop-in replacement for `input()` that guards against stray keypresses left ov
 ### File and folder pickers
 
 ```python
-files = pc.select_files(["jpg", "png"])   # opens a native file dialog, returns a tuple of paths or None
-folder = pc.select_folder()               # opens a native folder dialog, returns a path or None
+files = pc.select_files(prompt="Select an image", filetypes=["jpg", "png"])   # opens a native file dialog, returns a tuple of paths or None
+folder = pc.select_folder(prompt="Select a folder")               # prompt is provided by default. Opens a native folder dialog, returns a path or None
+
+files = pc.select_files_window(["jpg", "png"])  # opens purely the file selection dialog, no prompt, echo or reselections, same return as select_files()
+folder = pc.select_folder_window()  # opens purely the folder selection dialog, same return as select_folder()
 ```
 
 ### Misc utilities
@@ -225,4 +228,5 @@ The previous version of a style is automatically zipped into `font/legacy_fonts/
 ## Worth noticing
 
 When running, do not resize the window of powershell. Otherwise the formatting would break.
+
 Avoid having wrapped text. The line_counter does not work well with wrapped text.

@@ -2,46 +2,51 @@ import json
 import string
 import os
 
-def _get_cset(style):
+Glyph = dict[str, str]  # one glyph: {row number as a string: that row's text}
+CharacterSet = dict[str, Glyph] # a whole font style: {uppercase character: glyph}
+
+# ----------------------------------------------------------------------------------------------------------------------------------
+# CHAR SET GETTERS
+
+def _get_cset(style: str) -> CharacterSet:
+    """
+    extract the character set and store in a dictionary
+
+    :param style:           string,     the desired style
+    """
     script_dir = os.path.dirname(os.path.abspath(__file__))
     try:
-        cset = json.load(open(os.path.join(script_dir, 'font', f'{style}.json'), 'r', encoding='utf-8'))
+        cset: dict = json.load(open(os.path.join(script_dir, 'font', f'{style}.json'), 'r', encoding='utf-8'))
     except FileNotFoundError:
         raise Exception(f"Invalid style {style}: not supported by the font library")
     except Exception as e:
         raise Exception(f"Error loading style {style}: {str(e)}")
     return cset
 
-def get_character(char, style):
+def get_character(char: str, style: str) -> Glyph:
+    """
+    get the ascii art content for any character
+
+    :param char:            string,     any single character from A-Z
+    :param style:           string,     the desired style for ascii art
+    
+    :return:                dict        the ascii art in row number -> content per row
+    """
     if len(char) > 1 or not isinstance(char, str): raise Exception("Chracter invalid: must be a character")
     char = char.upper()
 
     cset = _get_cset(style)
     output_char = cset.get(char, None)
     if output_char is None:
-        missing = 'space' if char == ' ' else char
+        missing = 'whitespace' if char == ' ' else char
         raise Exception(f'File error: incomplete ascii character library. Missing character: {missing}')
 
     return output_char
 
-def build_display(input_string, style, delim=''):
-    if len(input_string) < 1: input_string = ' '
-
-    all_characters = set(input_string.upper())
-    cset = {}
-    for c in all_characters: cset.update({c: get_character(c, style)})
-
-    print_string = [c.upper() for c in input_string]
-    lines = []
-    line = 1
-    while all(cset.get(c).get(str(line), None) is not None for c in cset):
-        lines.append(delim.join(cset.get(char).get(str(line)) for char in print_string))
-        line += 1
-
-    width = len(lines[0]) if lines else 0
-    return '\n'.join(lines), width
+# ----------------------------------------------------------------------------------------------------------------------------------
+# CHAR SET SETTER
         
-def parse_font_file(path, sep):
+def parse_font_file(path: str, sep: str) -> CharacterSet:
     """
     parse a text file into a character set dictionary for a font style.
 
@@ -73,7 +78,7 @@ def parse_font_file(path, sep):
 
     return cset
 
-def set_cset(style, font_path, sep):
+def set_cset(style: str, font_path: str, sep: str) -> None:
     """
     parse a font text file and add or replace a style under ascii_art_font/font/.
 
@@ -90,7 +95,34 @@ def set_cset(style, font_path, sep):
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
-def _build_default_display(input_string, style):
+# ----------------------------------------------------------------------------------------------------------------------------------
+# DISPLAY BUILDERS
+
+def build_display(input_string: str, style: str, delim: str = '') -> tuple[str, int]:
+    """
+    get the output text in the ascii art given style, with the width of a single character
+
+    :param input_string:    string,     the content want to get ascii art from
+    :param style:           string,     the style desired
+    :param delim:           stirng,     the thing put in between each aschii art character, one on each row
+    """
+    if len(input_string) < 1: input_string = ' '
+
+    all_characters = set(input_string.upper())
+    cset = {}
+    for c in all_characters: cset.update({c: get_character(c, style)})
+
+    print_string = [c.upper() for c in input_string]
+    lines = []
+    line = 1
+    while all(cset.get(c).get(str(line), None) is not None for c in cset):
+        lines.append(delim.join(cset.get(char).get(str(line)) for char in print_string))
+        line += 1
+
+    width = len(lines[0]) if lines else 0
+    return '\n'.join(lines), width
+
+def _build_default_display(input_string: str, style: str) -> str:
     """
     build the rendered content of a default style, underlined by a separator.
 
@@ -107,7 +139,7 @@ def _build_default_display(input_string, style):
     lines.append('='*length)
     return '\n'.join(lines)
 
-def default_banner(input_string):
+def default_banner(input_string: str) -> str:
     """
     build the banner content.
 
@@ -117,7 +149,7 @@ def default_banner(input_string):
     """
     return _build_default_display(input_string, 'banner')
 
-def default_header(input_string):
+def default_header(input_string: str) -> str:
     """
     build the header content.
 

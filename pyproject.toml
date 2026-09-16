@@ -9,7 +9,7 @@ description = "Provide you an automation to construct a prettier interactive con
 authors = [{name = "MrCosine", email = "a95sun@uwaterloo.ca"}]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "keyboard>=0.13.5",
 ]
