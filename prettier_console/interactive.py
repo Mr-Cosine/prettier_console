@@ -90,7 +90,7 @@ class colored_output:
 
     def _get_escape(self, fg_color: str | None = None, bg_color: str | None = None) -> str:
         """
-        return ANSI color code
+        return ANSI color code (black, red, green, yellow, blue, magenta, cyan, white)
         """
         codes: list[str] = []
         if fg_color and fg_color.upper() in self._fg_map:
@@ -105,7 +105,7 @@ class colored_output:
         """
         print out colored content
 
-        :param color:       string, text color
+        :param color:       string,     text color (black, red, green, yellow, blue, magenta, cyan, white)
         :param objects:     any,        printing objects
         :param background:  string,     background color
         :param sep:         string,     delimintor between printing objects
@@ -123,7 +123,7 @@ class colored_output:
         """
         return colored text string for print
 
-        :param color:       string,     text color
+        :param color:       string,     text color (black, red, green, yellow, blue, magenta, cyan, white)
         :param objects:     any,        printing objects
         :param background:  string,     background color
         :param sep:         string,     delimintor between printing objects
