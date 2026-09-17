@@ -278,6 +278,21 @@ def print_selections(prompt: Prompt, options: Sequence[Option]) -> str:
 # ----------------------------------------------------------------------------------------------------------------------------------
 # OUTPUT BUNDLES
 
+def leaf(name: str, body: Callable[..., Any], params: Sequence[Any] | None = None) -> Any:
+    """
+    open up a leaf panel with a linear procedure
+
+    :param name:            string,         the name of the panel
+    :param body:            func,           the things needs to be executed.
+    :param params:          list,           the parameters for body, have to be positional argument.
+    :return:                any,            whatever body returned, so a leaf can feed a value back to its caller
+    """
+    clear_screen()
+    print_header(name)
+    result: Any = body(*params) if params is not None else body()
+    safe_input("Press Enter to return.")
+    return result
+
 def menu(name: str, prompt: Prompt, options: Sequence[Option] | None = None, home: bool = False) -> str:
     """
     open up a menu with single selection toward other menu
@@ -292,7 +307,7 @@ def menu(name: str, prompt: Prompt, options: Sequence[Option] | None = None, hom
                                 id:     string, 
                                 func: {
                                     body:   function, 
-                                    param:  [string...],
+                                    param:  [any...],
                                     }
                                 }
                                 ...
@@ -300,11 +315,11 @@ def menu(name: str, prompt: Prompt, options: Sequence[Option] | None = None, hom
     """
     # gather the necessary information for print_selections(options)
     if options is None: options = []
-    menu_options: list[Option] = [{'text': option['text'], 'color': option.get('color') or None, 'id': option['id']} for option in options]
+    menu_options: list[Option] = [{'text': option['text'], 'color': option.get('color', None), 'id': option['id']} for option in options]
 
     # add back option to allow to return to previous menu
-    if home: menu_options.append({'text': 'quit program', 'color': '', 'id': 'quit'})
-    else: menu_options.append({'text': 'return to previous', 'color': '', 'id': 'back'})
+    if home: menu_options.append({'text': 'quit program', 'color': '', 'id': '__quit'})
+    else: menu_options.append({'text': 'return to previous', 'color': '', 'id': '__back'})
     # check for any duplicated id to prevent ambiguation in searching the options
     if len([d.get('id') for d in menu_options]) != len(set([d.get('id') for d in menu_options])):
         raise Exception('duplicated id for options')
@@ -324,7 +339,7 @@ def menu(name: str, prompt: Prompt, options: Sequence[Option] | None = None, hom
             menu_options
         )
     
-        if chosen_id in ['back', 'quit']:
+        if chosen_id in ['__back', '__quit']:
             return chosen_id
 
         selected: Option | None = None
@@ -346,8 +361,8 @@ def menu(name: str, prompt: Prompt, options: Sequence[Option] | None = None, hom
                 params: Sequence[Any] = func.get('param', [])
                 result = body(*params)
             else: raise Exception(f'action provided for an option: {selected} is not callable.')
-            if result == 'quit':
-                return result
+            if result == '__quit':
+                return '__quit'
 
 def home_menu(name: str, prompt: Prompt, options: Sequence[Option] | None = None) -> None:
     """
@@ -363,14 +378,14 @@ def home_menu(name: str, prompt: Prompt, options: Sequence[Option] | None = None
                                 id:     string, 
                                 func: {
                                     body:   function, 
-                                    param:  [string...],
+                                    param:  [any...],
                                     }
                                 }
                                 ...
                             ]
     """
     result = menu(name, prompt, options, home=True)
-    if result == 'quit': quit_program(0)
+    if result == '__quit': quit_program(0)
 
 # ----------------------------------------------------------------------------------------------------------------------------------
 # PROGRAM EXIT
@@ -446,7 +461,7 @@ def select_folder(prompt: str = "select folder") -> str | None:
     global line_counter
     while True:
         line_counter = 0
-        default_colored_output.print(prompt, color="white", end=": ")
+        default_colored_output.print(prompt, color="white", end=": ", flush=True)
         folder = select_folder_window()
         if folder is not None:
             # a folder is a single path string, joining it would split it into characters
@@ -461,7 +476,7 @@ def select_folder(prompt: str = "select folder") -> str | None:
             return None
 
 
-def select_files(prompt: str = "select file(s)", file_types: str | Sequence[str] | None = None) -> tuple[str, ...] | None:
+def select_files(prompt: str = "Select file(s)", file_types: str | Sequence[str] | None = None) -> tuple[str, ...] | None:
     """
     create input, verification, and provide reselect for folder selection.
 
@@ -473,7 +488,7 @@ def select_files(prompt: str = "select file(s)", file_types: str | Sequence[str]
     global line_counter
     while True:
         line_counter = 0
-        default_colored_output.print(prompt, color="white", end=": ")
+        default_colored_output.print(prompt, color="white", end=": ", flush=True)
         files = select_files_window(file_types)
         if files is not None:
             preview = ", ".join(files)

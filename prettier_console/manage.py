@@ -23,7 +23,7 @@ def _cmd_upgrade(args):
 def _cmd_updatefont(args):
     if args.banner: style = 'banner'
     elif args.header: style = 'header'
-    else: style = args.style if args.style else os.path.splitext(os.path.basename(args.change_font))[0]
+    else: style = args.style if args.style else os.path.splitext(os.path.basename(args.path))[0]
     if args.sep: sep = args.sep
     else: raise argparse.ArgumentError("must specify separator for the font.")
 
@@ -40,7 +40,7 @@ def _cmd_updatefont(args):
             with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
                 zipf.write(target_path, arcname=f'{style}.json')
 
-        ascii_art_font.set_cset(style, font_path=args.change_font, sep=sep)
+        ascii_art_font.set_cset(style, font_path=args.path, sep=sep)
         print(f'Font updated.')
     except Exception as e:
         print(f'Error: {e}', file=sys.stderr)
@@ -66,7 +66,7 @@ def main():
         help='add or replace an ascii-art font style from a text file'
     )
     updatefont.add_argument(
-        'change_font',
+        'path',
         help="path to a text file with A-Z + space glyphs, one row per line, each character separated by '/'"
     )
     updatefont.add_argument(
