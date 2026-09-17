@@ -11,7 +11,7 @@ import sys
 import string
 import subprocess
 
-from .ascii_art_font import ascii_art_font
+from .ascii_art import ascii_art
 
 def _cmd_upgrade(args):
     r = subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "prettier_console"])
@@ -24,11 +24,11 @@ def _cmd_updatefont(args):
     if args.banner: style = 'banner'
     elif args.header: style = 'header'
     else: style = args.style if args.style else os.path.splitext(os.path.basename(args.path))[0]
-    if args.sep: sep = args.sep
+    if args.delim: delim = args.delim
     else: raise argparse.ArgumentError("must specify separator for the font.")
 
     try:
-        font_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ascii_art_font', 'font')
+        font_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ascii_art', 'font')
         target_path = os.path.join(font_folder_path, f'{style}.json')
 
         if os.path.exists(target_path):
@@ -40,7 +40,7 @@ def _cmd_updatefont(args):
             with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
                 zipf.write(target_path, arcname=f'{style}.json')
 
-        ascii_art_font.set_cset(style, font_path=args.path, sep=sep)
+        ascii_art.set_cset(style, font_path=args.path, delim=delim)
         print(f'Font updated.')
     except Exception as e:
         print(f'Error: {e}', file=sys.stderr)
@@ -70,7 +70,7 @@ def main():
         help="path to a text file with A-Z + space glyphs, one row per line, each character separated by '/'"
     )
     updatefont.add_argument(
-        '--sep', 
+        '--delim', 
         type=single_char, 
         required=True,
         help='separator between characters'

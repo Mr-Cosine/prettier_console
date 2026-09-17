@@ -76,23 +76,56 @@ tag = default_colored_output.get_print_string_text("[OK]", color="green")
 print(f"{tag} All tests passed")
 ```
 
-### Banners and headers (ASCII art)
+### Mannual print of ascii art banners and headers
 
 ```python
-pc.print_banner("prettier_console")
-pc.print_header("v1.0 released", color="cyan")
+pc.print_banner("prettier")
+pc.print_header("console ready", color="cyan")
 ```
+
+```
+██████╗  ██████╗  ███████╗ ████████╗ ████████╗ ████╗ ███████╗ ██████╗ 
+██╔══██╗ ██╔══██╗ ██╔════╝ ╚══██╔══╝ ╚══██╔══╝ ╚██╔╝ ██╔════╝ ██╔══██╗
+██████╔╝ ██████╔╝ █████╗      ██║       ██║     ██║  █████╗   ██████╔╝
+██╔═══╝  ██╔══██╗ ██╔══╝      ██║       ██║     ██║  ██╔══╝   ██╔══██╗
+██║      ██║  ██║ ███████╗    ██║       ██║    ████╗ ███████╗ ██║  ██║
+╚═╝      ╚═╝  ╚═╝ ╚══════╝    ╚═╝       ╚═╝    ╚═══╝ ╚══════╝ ╚═╝  ╚═╝
+======================================================================
+┏━┓ ┏━┓ ┳━┓ ┏━┓ ┏━┓ ┓   ┏━┓    ┳━┓ ┏━┓ ┏━┓ ┳━┓ ┓ ┏
+┃   ┃ ┃ ┃ ┃ ┗━┓ ┃ ┃ ┃   ┣━     ┣┳┛ ┣━  ┣━┫ ┃ ┃ ┗━┫
+┗━┛ ┗━┛ ┛ ┗ ┗━┛ ┗━┛ ┗━┛ ┗━┛    ┛┗┛ ┗━┛ ┛ ┗ ┻━┛ ┗━┛
+==================================================
+```
+
+`banner` is the tall six-row style, `header` the compact three-row one. Both underline the text with `=` as wide as the widest row.
+
+> **The bundled fonts only cover `A-Z` and space.** Digits, punctuation and `_` are not in the set, and would not be added when importing custom font. Lowercase is upper-cased automatically.
 
 Multi-line input is supported — `\n` starts a new row of large text:
 
 ```python
-pc.print_banner("quick brown fox\njumps over the\nlazy dog")
+pc.print_header("quick brown fox\njumps over the\nlazy dog")
 ```
 
-### Yes/no and custom menus
+```
+┏━┓ ┳ ┳  ┳  ┏━┓ ┓┏┓    ┳━┓ ┳━┓ ┏━┓ ┓ ┏ ┳━┓    ┏━┓ ┏━┓ ┏┓┏━
+┃ ┃ ┃ ┃  ┃  ┃   ┣┫     ┣━┫ ┣┳┛ ┃ ┃ ┃┃┃ ┃ ┃    ┣━  ┃ ┃  ┣┫ 
+┗━┻ ┗━┛  ┻  ┗━┛ ┛┗┛    ┻━┛ ┛┗┛ ┗━┛ ┗┻┛ ┛ ┗    ┻   ┗━┛ ━┛┗┛
+ ┏┳ ┳ ┳ ┳┓┓ ┳━┓ ┏━┓    ┏━┓ ┓ ┏ ┏━┓ ┳━┓    ┏┳┓ ┓ ┏ ┏━┓
+  ┃ ┃ ┃ ┃┃┃ ┣━┛ ┗━┓    ┃ ┃ ┃┏┛ ┣━  ┣┳┛     ┃  ┣━┫ ┣━ 
+┗━┛ ┗━┛ ┛ ┗ ┻   ┗━┛    ┗━┛ ┗┛  ┗━┛ ┛┗┛     ┻  ┛ ┗ ┗━┛
+┓   ┏━┓ ━━┓ ┓ ┏    ┳━┓ ┏━┓ ┏━┓
+┃   ┣━┫ ┏┛  ┗━┫    ┃ ┃ ┃ ┃ ┃┏┓
+┗━┛ ┛ ┗ ┗━┛ ┗━┛    ┻━┛ ┗━┛ ┗━┛
+==========================================================
+```
+
+Any other style — including one added with `updatefont` — renders through `any_style`, which returns the string instead of printing it:
+
+### Printing navigatable selections
 
 ```python
-answer = pc.print_yesorno("Delete this file?")   # returns 'y' or 'n'
+answer = pc.print_yesorno("Delete this file?")   # pre-built yes-and-no, returns 'y' or 'n'
 
 choice = pc.print_selections(
     "Pick an environment:",
@@ -214,6 +247,12 @@ files = pc.select_files_window(["jpg", "png"])  # opens purely the file selectio
 folder = pc.select_folder_window()  # opens purely the folder selection dialog, same return as select_folder()
 ```
 
+### ASCII art library
+
+```python
+import prettier_console.ascii_art
+```
+
 ### Misc utilities
 
 ```python
@@ -233,21 +272,21 @@ python -m prettier_console.manage --help
 
 | Command | Description |
 |---|---|
-| `updatefont <path> --sep <char> [--style NAME \| --banner \| --header]` | Add or replace an ASCII-art font style from a text file. |
+| `updatefont <path> --delim <char> [--style NAME \| --banner \| --header]` | Add or replace an ASCII-art font style from a text file. |
 | `upgrade` | Upgrade the installed package via pip. |
 
 ### `updatefont` — adding custom ASCII-art fonts
 
-The banner/header glyphs are stored as JSON under `prettier_console/ascii_art_font/font/`. You can add or replace a style from a plain-text font file: one row per line, with the glyph segments for `A-Z` + space on each row separated by the character you pass to `--sep`.
+The banner/header glyphs are stored as JSON under `prettier_console/ascii_art/font/`. You can add or replace a style from a plain-text font file: one row per line, with the glyph segments for `A-Z` + space on each row separated by the character you pass to `--delim`.
 
 ```bash
-prettier_console updatefont my_font.txt --sep /                 # style name defaults to the file name -> "my_font"
-prettier_console updatefont my_font.txt --sep / --style retro   # save under a style name of your choice
-prettier_console updatefont my_font.txt --sep / --banner        # overwrite the default banner style
-prettier_console updatefont my_font.txt --sep / --header        # overwrite the default header style
+prettier_console updatefont my_font.txt --delim /                 # style name defaults to the file name -> "my_font"
+prettier_console updatefont my_font.txt --delim / --style retro   # save under a style name of your choice
+prettier_console updatefont my_font.txt --delim / --banner        # overwrite the default banner style
+prettier_console updatefont my_font.txt --delim / --header        # overwrite the default header style
 ```
 
-- `--sep` is required and must be a single character.
+- `--delim` is required and must be a single character.
 - `--style` accepts alphanumeric names only, and is mutually exclusive with `--banner` and `--header`.
 - The previous version of a style is automatically zipped into `font/legacy_fonts/` before being overwritten.
 
@@ -259,7 +298,7 @@ prettier_console upgrade
 
 Runs `pip install --upgrade prettier_console` with the current interpreter and exits with pip's exit code. Note that this reinstalls the package directory, so **custom fonts are reset to the defaults** — keep your font source files if you want to reapply them with `updatefont` afterwards.
 
-## API reference
+### API reference for prettier_console
 
 | Function | Description |
 |---|---|
@@ -281,7 +320,27 @@ Runs `pip install --upgrade prettier_console` with the current interpreter and e
 | `home_menu(name, prompt, options=None)` | Entry-point menu; quits the program via `quit_program()`. |
 | `quit_program(code=0)` | Clears the screen, prints a goodbye message, exits. |
 
-## Instances comes with the module
+### API reference for prettier_console.ascii_art
+
+These are not re-exported at the top level — import them from the subpackage:
+
+```python
+from prettier_console.ascii_art import any_style, build_display, set_cset
+```
+
+| Function | Description |
+|---|---|
+| `any_style(input_string, style)` | Renders `input_string` in any installed style and underlines it with `=` as wide as the widest row; returns the string. `\n` starts a new row of large text. |
+| `default_banner(input_string)` | `any_style(input_string, "banner")`. What `print_banner` renders before coloring. |
+| `default_header(input_string)` | `any_style(input_string, "header")`. What `print_header` renders before coloring. |
+| `build_display(input_string, style, delim="")` | Lower-level renderer for a **single** row of text: returns `(rendered_string, width)` with no underline. `delim` is inserted between glyphs on every row. |
+| `get_character(char, style)` | Glyph for one character as `{row_number: row_text}`, keyed by row number as a string. Upper-cases `char`; raises if the style lacks it. |
+| `get_cset(style)` | Loads a whole style from `ascii_art/font/<style>.json` as `{character: glyph}`; raises `Invalid style …` if the style is not installed. |
+| `set_cset(style, font_path, delim)` | Parses a plain-text font file and writes it to `ascii_art/font/<style>.json`, adding or replacing that style. The programmatic form of [`updatefont`](#updatefont--adding-custom-ascii-art-fonts); unlike the CLI it does **not** archive the previous version. |
+
+All of them raise a plain `Exception` on a missing style or a character the style does not define.
+
+### Instances comes with the module
 
 | Instance | Description |
 |---|---|

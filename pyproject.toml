@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "prettier_console" 
-version = "1.3.0"
+version = "1.3.2"
 description = "Provide you an automation to construct a prettier interactive console in one call"
 authors = [{name = "MrCosine", email = "a95sun@uwaterloo.ca"}]
 license = {text = "MIT"}
@@ -26,6 +26,7 @@ prettier_console = "prettier_console.manage:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
+include = ["prettier_console"]
 
 [tool.setuptools.package-data]
-prettier_console = ["ascii_art_font/font/*.json"]
+prettier_console = ["ascii_art/font/*.json"]

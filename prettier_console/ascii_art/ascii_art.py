@@ -8,7 +8,7 @@ CharacterSet = dict[str, Glyph] # a whole font style: {uppercase character: glyp
 # ----------------------------------------------------------------------------------------------------------------------------------
 # CHAR SET GETTERS
 
-def _get_cset(style: str) -> CharacterSet:
+def get_cset(style: str) -> CharacterSet:
     """
     extract the character set and store in a dictionary
 
@@ -35,7 +35,7 @@ def get_character(char: str, style: str) -> Glyph:
     if len(char) > 1 or not isinstance(char, str): raise Exception("Chracter invalid: must be a character")
     char = char.upper()
 
-    cset = _get_cset(style)
+    cset = get_cset(style)
     output_char = cset.get(char, None)
     if output_char is None:
         missing = 'whitespace' if char == ' ' else char
@@ -46,7 +46,7 @@ def get_character(char: str, style: str) -> Glyph:
 # ----------------------------------------------------------------------------------------------------------------------------------
 # CHAR SET SETTER
         
-def parse_font_file(path: str, sep: str) -> CharacterSet:
+def _parse_font_file(path: str, delim: str) -> CharacterSet:
     """
     parse a text file into a character set dictionary for a font style.
 
@@ -67,10 +67,10 @@ def parse_font_file(path: str, sep: str) -> CharacterSet:
     cset = {character: {} for character in characters}
 
     for i, line in enumerate(lines):
-        segments = line.split(sep=sep)
+        segments = line.split(delim)
         if len(segments) != len(characters):
             raise Exception(
-                f"Font file error: line {i + 1} has {len(segments)} {sep}-separated segments, "
+                f"Font file error: line {i + 1} has {len(segments)} {delim}-separated segments, "
                 f'expected {len(characters)} (A-Z + space).'
             )
         for character, segment in zip(characters, segments):
@@ -78,9 +78,9 @@ def parse_font_file(path: str, sep: str) -> CharacterSet:
 
     return cset
 
-def set_cset(style: str, font_path: str, sep: str) -> None:
+def set_cset(style: str, font_path: str, delim: str) -> None:
     """
-    parse a font text file and add or replace a style under ascii_art_font/font/.
+    parse a font text file and add or replace a style under ascii_art/font/.
 
     :param style:           string,     the style key to save the parsed font under
     :param font_path:       string,     path to the font text file
@@ -90,7 +90,7 @@ def set_cset(style: str, font_path: str, sep: str) -> None:
     os.makedirs(font_dir, exist_ok=True)
     json_path = os.path.join(font_dir, f'{style}.json')
 
-    data = parse_font_file(font_path, sep)
+    data = _parse_font_file(font_path, delim)
 
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
@@ -122,39 +122,40 @@ def build_display(input_string: str, style: str, delim: str = '') -> tuple[str, 
     width = len(lines[0]) if lines else 0
     return '\n'.join(lines), width
 
-def _build_default_display(input_string: str, style: str) -> str:
+def any_style(input_string: str, style: str) -> str:
     """
-    build the rendered content of a default style, underlined by a separator.
+    build the content out of any styles(default, custom etc.) with bottom line.
 
-    :param input_string:    string,     the text to render, '\\n' splits it into rows
-    :param style:           string,     the font style to render with
+    :param input_string:    string,     the text to render
+    :param style:           string,     the desired style
 
-    :return:                string,     the rendered content, rows joined by '\\n'
+    :return:                string,     the rendered header content
     """
     lines = []
-    length = 0
+    width = 0
     for line in input_string.split('\n'):
         display_content, length = build_display(line, style, delim=' ')
         lines.append(display_content)
-    lines.append('='*length)
+        width = max(width, length)
+    lines.append('='*width)
     return '\n'.join(lines)
 
 def default_banner(input_string: str) -> str:
     """
-    build the banner content.
+    build the banner content with bottom line.
 
     :param input_string:    string,     the text to render
 
     :return:                string,     the rendered banner content
     """
-    return _build_default_display(input_string, 'banner')
+    return any_style(input_string=input_string, style='banner')
 
 def default_header(input_string: str) -> str:
     """
-    build the header content.
+    build the header content with bottom line.
 
     :param input_string:    string,     the text to render
 
     :return:                string,     the rendered header content
     """
-    return _build_default_display(input_string, 'header')
+    return any_style(input_string=input_string, style='header')
