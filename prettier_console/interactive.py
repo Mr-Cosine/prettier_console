@@ -41,7 +41,7 @@ def safe_input(prompt: str = "") -> str:
                         print('\b \b', end='', flush=True)
                 elif event.name == 'space':
                     result.append(' ')
-                    default_colored_output.print(' ', color='white', end='', flush=True)
+                    default_colored_output.print(' ', end='', flush=True)
                 elif len(event.name) == 1:
                     result.append(event.name)
                     default_colored_output.print(event.name, color='white', end='', flush=True)
@@ -459,20 +459,21 @@ def select_folder(prompt: str = "select folder") -> str | None:
     """
 
     global line_counter
+    MAX_FNAME_LEN = 30
     while True:
         line_counter = 0
         default_colored_output.print(prompt, color="white", end=": ", flush=True)
         folder = select_folder_window()
         if folder is not None:
             # a folder is a single path string, joining it would split it into characters
-            default_colored_output.print((folder[:30] + "...") if len(folder) > 30 else folder)
+            default_colored_output.print((folder[:MAX_FNAME_LEN] + "...") if len(folder) > MAX_FNAME_LEN else folder, color="white", flush=True)
             answer = print_yesorno("Is this correct?")
             if answer == 'y':
                 return folder
             else:
                 clear_lines(line_counter)
         else:
-            default_colored_output.print("Selection aborted.")
+            default_colored_output.print("Selection aborted.", color="white")
             return None
 
 
@@ -486,13 +487,18 @@ def select_files(prompt: str = "Select file(s)", file_types: str | Sequence[str]
     """
 
     global line_counter
+    MAX_FNAME_LEN = 20
     while True:
         line_counter = 0
         default_colored_output.print(prompt, color="white", end=": ", flush=True)
         files = select_files_window(file_types)
         if files is not None:
-            preview = ", ".join(files)
-            default_colored_output.print((preview[:30] + "...") if len(preview) > 30 else preview)
+            from pathlib import Path
+            preview = ", ".join(
+                [Path(f).name[:MAX_FNAME_LEN] + "..." if len(Path(f).name) > MAX_FNAME_LEN else Path(f).name 
+                for f in files]
+                )
+            default_colored_output.print(preview, color="white", flush=True)
             answer = print_yesorno("Is this correct?")
             if answer == 'y':
                 return files
