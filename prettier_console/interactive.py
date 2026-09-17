@@ -315,7 +315,7 @@ def menu(name: str, prompt: Prompt, options: Sequence[Option] | None = None, hom
     """
     # gather the necessary information for print_selections(options)
     if options is None: options = []
-    menu_options: list[Option] = [{'text': option['text'], 'color': option.get('color', None), 'id': option['id']} for option in options]
+    menu_options = [{'text': option['text'], 'color': option.get('color', None), 'id': option['id']} for option in options]
 
     # add back option to allow to return to previous menu
     if home: menu_options.append({'text': 'quit program', 'color': '', 'id': '__quit'})
