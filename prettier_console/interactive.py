@@ -6,7 +6,7 @@ import subprocess
 import os
 import sys
 import keyboard
-from .ascii_art import ascii_art as ascii_art
+from .ascii_art import ascii_art
 
 from typing import Any, Callable, Sequence, NoReturn
 Prompt = str | Callable[[], str] # prompt is text or a builder function return text
