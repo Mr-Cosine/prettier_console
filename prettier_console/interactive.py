@@ -12,8 +12,6 @@ from typing import Any, Callable, Sequence, NoReturn
 Prompt = str | Callable[[], str] # prompt is text or a builder function return text
 Option = dict[str, Any] # one entry of a selection list
 
-line_counter: int = 0
-
 # ----------------------------------------------------------------------------------------------------------------------------------
 # INPUT
 
@@ -51,7 +49,7 @@ def safe_input(prompt: str = "") -> str:
 #----------------------------------------------------------------------------------------------------------------------------------
 # OUTPUT GADGETS
 
-class colored_output:
+class Colored_output:
     """
     Colors: black, red, green, yellow, blue, magenta, cyan, white.
     """
@@ -116,8 +114,7 @@ class colored_output:
         text = sep.join(str(obj) for obj in objects)
         colored_text = f"{self._get_escape(color, background)}{text}{self._RESET}"
         print(colored_text, end=end, file=file, flush=flush)
-        global line_counter
-        if file is None or file is sys.stdout: line_counter += (text + end).count('\n')
+        if file is None or file is sys.stdout: line_counter.record_line((text + end).count('\n'))
 
     def get_print_string_text(self, *objects: Any, sep: str = ' ', color: str | None = None, background: str | None = None) -> str:
         """
@@ -132,7 +129,28 @@ class colored_output:
         escape = self._get_escape(color, background)
         return f"{escape}{text}{self._RESET}"
     
-default_colored_output = colored_output(bright=False) # shared instance used for every output of this module
+default_colored_output = Colored_output(bright=False) # shared instance used for every output of this module
+
+class Line_counter:
+    _printed_lines = 0
+    def __init__(self) -> None:
+        self._printed_lines = 0
+
+    def reset(self) -> None:
+        self._printed_lines = 0
+
+    def set(self, line_num: int) -> None:
+        if line_num >= 0: self._printed_lines = line_num
+        else: raise ValueError("Cannot set negative number of printed lines")
+
+    def record_line(self, line_num: int = 1) -> None:
+        if line_num >= 0: self._printed_lines += line_num
+        else: raise ValueError("Cannot record negative number of printed lines")
+
+    def printed_lines(self) -> int:
+        return self._printed_lines
+
+line_counter: Line_counter = Line_counter()
 
 def display_width(text: Any) -> int:
     """
@@ -152,10 +170,9 @@ def clear_screen() -> None:
     """
     flush content on the console
     """
-    global line_counter
     command = 'cls' if os.name == 'nt' else 'clear'
     subprocess.run(command, shell=True, check=False)
-    line_counter = 0
+    line_counter.reset()
 
 def clear_lines(line_num: int) -> None:
     """
@@ -163,10 +180,9 @@ def clear_lines(line_num: int) -> None:
 
     :param line_num:        int,        the number of lines to be flushed
     """
-    global line_counter
     if line_num <= 0: return
     print(f"\033[{line_num}A\033[0J", end="", flush=True)
-    line_counter = max(0, line_counter - line_num)
+    line_counter.set(max(0, line_counter.printed_lines() - line_num))
 
 def print_header(input_string: str, color: str = 'white') -> None:
     """
@@ -458,10 +474,9 @@ def select_folder(prompt: str = "select folder") -> str | None:
     :return:                the selected folder path, if not selected return None
     """
 
-    global line_counter
     MAX_FNAME_LEN = 30
     while True:
-        line_counter = 0
+        line_counter.reset()
         default_colored_output.print(prompt, color="white", end=": ", flush=True)
         folder = select_folder_window()
         if folder is not None:
@@ -471,7 +486,7 @@ def select_folder(prompt: str = "select folder") -> str | None:
             if answer == 'y':
                 return folder
             else:
-                clear_lines(line_counter)
+                clear_lines(line_counter.printed_lines())
         else:
             default_colored_output.print("Selection aborted.", color="white")
             return None
@@ -486,10 +501,9 @@ def select_files(prompt: str = "Select file(s)", file_types: str | Sequence[str]
     :return:                the selected folder path, if not selected return None
     """
 
-    global line_counter
     MAX_FNAME_LEN = 20
     while True:
-        line_counter = 0
+        line_counter.reset()
         default_colored_output.print(prompt, color="white", end=": ", flush=True)
         files = select_files_window(file_types)
         if files is not None:
@@ -503,7 +517,7 @@ def select_files(prompt: str = "Select file(s)", file_types: str | Sequence[str]
             if answer == 'y':
                 return files
             else:
-                clear_lines(line_counter)
+                clear_lines(line_counter.printed_lines())
         else:
             default_colored_output.print("Selection aborted.")
             return None

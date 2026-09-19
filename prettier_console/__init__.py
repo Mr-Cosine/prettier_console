@@ -1,6 +1,7 @@
 from .interactive import (
-    colored_output,
+    Colored_output,
     default_colored_output,
+    Line_counter,
     line_counter,
     display_width,
     safe_input,
@@ -19,3 +20,5 @@ from .interactive import (
     home_menu,
     quit_program
 )
+
+from . import ascii_art
