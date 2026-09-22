@@ -55,7 +55,7 @@ Choose from the following 3 options:
       3.quit program
 ```
 
-Pressing Enter on "hello world" calls hello_world() with no arguments; pressing Enter on "hello, Ada" calls hello_name("Ada"). Either way, once the handler returns, you're back at this menu — selecting "quit program" is what actually exits (via quit_program()). The options return and quit program is built into the menu(quit program for home_menu(), and return for menu()), so do not add them in the customized choice.
+Pressing Enter on "hello world" calls say_hello() with no arguments; pressing Enter on "hello, Ada" calls say_hello_to("Ada"). Either way, once the handler returns, you're back at this menu — selecting "quit program" is what actually exits (via quit_program()). The options return and quit program is built into the menu(quit program for home_menu(), and return for menu()), so do not add them in the customized choice.
 
 ## Usage
 
@@ -75,12 +75,12 @@ bright_output.print("Critical error in bright red", color="red")
 tag = default_colored_output.get_print_string_text("[OK]", color="green")
 ```
 
-### Mannual print of ascii art banners and headers
+### Customizing the print of ascii art banners and headers
 
 ```python
 import prettier_console as pc
 pc.print_banner("prettier")
-pc.print_header("console ready", color="cyan")
+pc.print_header("console ready", color="cyan", background="red")
 ```
 
 ```
@@ -123,13 +123,14 @@ Any other style — including one added with `updatefont` — renders through `a
 
 ```python
 from prettier_console import ascii_art
+from prettier_console import default_colored_output
 
 # assume added a font named custom_font1
 text = ascii_art.any_style(input_string="hello world", style="custom_font1")
-print(text)
+default_colored_output.print(text)
 ```
 
-### Printing navigatable selections
+### Printing navigable selections
 
 ```python
 answer = pc.print_yesorno("Delete this file?")   # pre-built yes-and-no, returns 'y' or 'n'
@@ -144,7 +145,7 @@ choice = pc.print_selections(
 )  # returns the chosen id (so requires being unique), navigable with the up/down arrow keys
 ```
 
-### Full navigable menus
+### Fully navigable menus
 
 `menu()` builds a single screen; `home_menu()` is the entry point of your app (it adds a "quit" option instead of "back", and calls `quit_program()` when chosen).
 
@@ -227,7 +228,7 @@ def show_report(rows, title):
     return pc.leaf("report", print_report, params=[rows, title])
 
 def pick_file():
-    # if just one single procedure, you can directly put the funciton in the parameter without a funciton wrapper
+    # if just one single procedure, you can directly put the function in the parameter without a function wrapper
     # pass the callable itself — no parentheses, leaf() calls it for you with params
     return pc.leaf("file select", pc.default_colored_output.print, params=["Select any file here"])
 
@@ -291,7 +292,7 @@ Unlike `print_banner()` / `print_header()`, these return the rendered string ins
 ```python
 pc.clear_screen()                 # cross-platform 'cls'/'clear'
 width = pc.display_width("你好 world")   # display width accounting for full-width CJK characters
-pc.quit_program(0)                # clears the screen, prints a goodbye message, exits
+pc.quit_program(code=1)                # clears the screen, prints a goodbye message, exits
 ```
 
 ## Command line

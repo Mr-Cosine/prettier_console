@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "prettier_console" 
 version = "1.4.3"
-description = "Provide you an automation to construct a prettier interactive console in one call"
+description = "Provide you a toolkit to construct arrow-key menus, ASCII-art banners and colored output text for your Python terminal apps."
 authors = [{name = "MrCosine", email = "a95sun@uwaterloo.ca"}]
 license = {text = "MIT"}
 readme = "README.md"
