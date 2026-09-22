@@ -40,7 +40,7 @@ def _cmd_updatefont(args):
             with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
                 zipf.write(target_path, arcname=f'{style}.json')
 
-        ascii_art.set_cset(style, font_path=args.path, delim=delim)
+        ascii_art._set_cset(style, font_path=args.path, delim=delim)
         print(f'Font updated.')
     except Exception as e:
         print(f'Error: {e}', file=sys.stderr)

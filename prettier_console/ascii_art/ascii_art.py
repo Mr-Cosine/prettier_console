@@ -78,7 +78,7 @@ def _parse_font_file(path: str, delim: str) -> CharacterSet:
 
     return cset
 
-def set_cset(style: str, font_path: str, delim: str) -> None:
+def _set_cset(style: str, font_path: str, delim: str) -> None:
     """
     parse a font text file and add or replace a style under ascii_art/font/.
 

@@ -2,6 +2,18 @@
 
 Interactive, colorized command-line UI toolkit for Python — arrow-key menus, ASCII-art banners, colored text, and simple file/folder pickers.
 
+## License
+
+```
+Copyright (c) 2026 Mr-Cosine
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
+
 ## Installation
 
 ```bash
@@ -291,7 +303,7 @@ Unlike `print_banner()` / `print_header()`, these return the rendered string ins
 
 ```python
 pc.clear_screen()                 # cross-platform 'cls'/'clear'
-width = pc.display_width("你好 world")   # display width accounting for full-width CJK characters
+width = pc.display_width("你好 world")   # displayed width accounting for string with full-width CJK and latin characters
 pc.quit_program(code=1)                # clears the screen, prints a goodbye message, exits
 ```
 
@@ -336,14 +348,19 @@ Runs `pip install --upgrade prettier_console` with the current interpreter and e
 
 ### prettier_console
 
+
 ```python
+# Importing the library
 import prettier_console as pc
+
+# Importinig the module
+import prettier_console.prettier_console as pc
 ```
 
 | Function | Description |
 |---|---|
 | `Colored_output(bright=False)` | Class for producing ANSI-colored output. |
-| `Line_counter()` | Class tracking how many lines have been printed. You rarely need your own — use the shared `line_counter` instance below. |
+| `Line_counter()` | Class tracking how many lines have been printed. You rarely need your own — use the shared `default_line_counter` instance below. |
 | `display_width(text)` | Display width of a string, counting CJK characters as 2. |
 | `safe_input(prompt="")` | `input()` replacement resilient to buffered keypresses. |
 | `clear_screen()` | Clears the terminal, cross-platform. |
@@ -364,7 +381,11 @@ import prettier_console as pc
 ### prettier_console.ascii_art
 
 ```python
+#Importing the library
 from prettier_console import ascii_art as ascii
+
+# Importing the module (not recommended)
+import prettier_console.ascii_art.ascii_art as ascii
 ```
 
 | Function | Description |
@@ -375,20 +396,25 @@ from prettier_console import ascii_art as ascii
 | `build_display(input_string, style, delim="")` | Lower-level renderer for a **single** row of text: returns `(rendered_string, width)` with no underline. `delim` is inserted between glyphs on every row. |
 | `get_character(char, style)` | Glyph for one character as `{row_number: row_text}`, keyed by row number as a string. Upper-cases `char`; raises if the style lacks it. |
 | `get_cset(style)` | Loads a whole style from `ascii_art/font/<style>.json` as `{character: glyph}`; raises `Invalid style …` if the style is not installed. |
-| `set_cset(style, font_path, delim)` | Parses a plain-text font file and writes it to `ascii_art/font/<style>.json`, adding or replacing that style. The programmatic form of [`updatefont`](#updatefont--adding-custom-ascii-art-fonts); unlike the CLI it does **not** archive the previous version. |
 
 All of them raise a plain `Exception` on a missing style or a character the style does not define.
 
 ### Instances with prettier_console
 
 ```python
+# Using through importing individual instance (recommended)
 from prettier_console import <instance1>, <instance2>...
+<instance1>.<member_function>()
+
+# Using through importing library
+import prettier_console as pc
+pc.<instance1>.<member_function>()
 ```
 
 | Instance | Description |
 |---|---|
 | `default_colored_output` | Shared `Colored_output` instance, for using the functions without having to instantiate `Colored_output`. |
-| `line_counter` | Shared `Line_counter` instance. `default_colored_output` updates it automatically, so it always holds the number of lines printed since the last reset (notice: normal `print()` does not count). |
+| `default_line_counter` | Shared `Line_counter` instance. `default_colored_output` updates it automatically, so it always holds the number of lines printed since the last reset (notice: normal `print()` does not count). |
 
 **`default_colored_output` methods**
 
@@ -399,21 +425,21 @@ from prettier_console import <instance1>, <instance2>...
 
 Valid `color` and `background` values are `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan` and `white`; an unrecognized name is ignored rather than raising. Build your own instance with `Colored_output(bright=True)` for the bright variants of the same eight.
 
-Only `print()` touches the shared `line_counter`, and only when `file` is `None` or `sys.stdout` — redirecting to another stream leaves the count alone. `get_print_string_text()` never counts, since it prints nothing.
+Only `print()` touches the shared `default_line_counter`, and only when `file` is `None` or `sys.stdout` — redirecting to another stream leaves the count alone. `get_print_string_text()` never counts, since it prints nothing.
 
-**`line_counter` methods:** 
+**`default_line_counter` methods:** 
 
 | Method | Description |
 |---|---|
-| `line_counter.printed_lines()` | Returns the current count as an `int`. |
-| `line_counter.reset()` | Sets the count back to `0`. Called for you by `clear_screen()`. |
-| `line_counter.record_line(line_num=1)` | Adds to the count. Raises `ValueError` on a negative argument. |
-| `line_counter.set(line_num)` | Overwrites the count. Raises `ValueError` on a negative argument. |
+| `default_line_counter.printed_lines()` | Returns the current count as an `int`. |
+| `default_line_counter.reset()` | Sets the count back to `0`. Called for you by `clear_screen()`. |
+| `default_line_counter.record_line(line_num=1)` | Adds to the count. Raises `ValueError` on a negative argument. |
+| `default_line_counter.set(line_num)` | Overwrites the count. Raises `ValueError` on a negative argument. |
 
-Because it is a shared object, `from prettier_console import line_counter` gives you a name that keeps tracking the live count.
+Because it is a shared object, `from prettier_console import default_line_counter` gives you a name that keeps tracking the live count.
 
 ## Worth noticing
 
 When running, do not resize the window of powershell. Otherwise the formatting would break.
 
-Avoid having wrapped text. The line_counter does not work well with wrapped text. You may manually control text wrapping using "\n" in print.
+Avoid having wrapped text. The `Line_counter` class does not work well with wrapped text. You may manually control text wrapping using "\n" in print, which is well supported.

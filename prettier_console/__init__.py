@@ -1,8 +1,8 @@
-from .interactive import (
+from .prettier_console import (
     Colored_output,
     default_colored_output,
     Line_counter,
-    line_counter,
+    default_line_counter,
     display_width,
     safe_input,
     clear_screen,
