@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "prettier_console" 
-version = "1.4.3"
+version = "1.4.4"
 description = "Provide you a toolkit to construct arrow-key menus, ASCII-art banners and colored output text for your Python terminal apps."
 authors = [{name = "MrCosine", email = "a95sun@uwaterloo.ca"}]
 license = {text = "MIT"}
