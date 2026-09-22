@@ -8,6 +8,7 @@ import sys
 import keyboard
 from .ascii_art import ascii_art
 
+from enum import Enum
 from typing import Any, Callable, Sequence, NoReturn
 Prompt = str | Callable[[], str] # prompt is text or a builder function return text
 Option = dict[str, Any] # one entry of a selection list
@@ -21,7 +22,7 @@ def safe_input(prompt: str = "") -> str:
 
     :param prompt:          string,     text displayed before asking for input
     """
-    if prompt: default_colored_output.print(prompt, color='white', end='', flush=True)
+    if prompt: default_colored_output.print(prompt, color=dco.colors.white, end='', flush=True)
 
     result: list[str] = []
 
@@ -33,16 +34,15 @@ def safe_input(prompt: str = "") -> str:
                 if event.name == 'enter':
                     default_colored_output.print()
                     return ''.join(result)
-                elif event.name == 'backspace':
-                    if result:
-                        result.pop()
-                        print('\b \b', end='', flush=True)
+                elif event.name == 'backspace' and result:
+                    result.pop()
+                    print('\b \b', end='', flush=True)
                 elif event.name == 'space':
                     result.append(' ')
                     default_colored_output.print(' ', end='', flush=True)
                 elif len(event.name) == 1:
                     result.append(event.name)
-                    default_colored_output.print(event.name, color='white', end='', flush=True)
+                    default_colored_output.print(event.name, color=dco.colors.white, end='', flush=True)
         except:
             return input()
 
@@ -54,23 +54,19 @@ class Colored_output:
     Colors: black, red, green, yellow, blue, magenta, cyan, white.
     """
 
-    _NORMAL_FG: dict[str, int] = {
-        'BLACK': 30, 'RED': 31, 'GREEN': 32, 'YELLOW': 33,
-        'BLUE': 34, 'MAGENTA': 35, 'CYAN': 36, 'WHITE': 37
-    }
-    _NORMAL_BG: dict[str, int] = {
-        'BLACK': 40, 'RED': 41, 'GREEN': 42, 'YELLOW': 43,
-        'BLUE': 44, 'MAGENTA': 45, 'CYAN': 46, 'WHITE': 47
-    }
+    class colors(str, Enum):
+        """
+        the color names accepted by every color and background parameter.
+        members are read-only and are plain strings, so colors.white and 'white' are interchangeable
+        """
+        black = 'BLACK'; red = 'RED'; green = 'GREEN'; yellow = 'YELLOW'
+        blue = 'BLUE'; magenta = 'MAGENTA'; cyan = 'CYAN'; white = 'WHITE'
 
-    _BRIGHT_FG: dict[str, int] = {
-        'BLACK': 90, 'RED': 91, 'GREEN': 92, 'YELLOW': 93,
-        'BLUE': 94, 'MAGENTA': 95, 'CYAN': 96, 'WHITE': 97
-    }
-    _BRIGHT_BG: dict[str, int] = {
-        'BLACK': 100, 'RED': 101, 'GREEN': 102, 'YELLOW': 103,
-        'BLUE': 104, 'MAGENTA': 105, 'CYAN': 106, 'WHITE': 107
-    }
+    _ORDER = ('BLACK', 'RED', 'GREEN', 'YELLOW', 'BLUE', 'MAGENTA', 'CYAN', 'WHITE')
+    _NORMAL_FG: dict[str, int] = {c: 30 + i for i, c in enumerate(_ORDER)}
+    _NORMAL_BG: dict[str, int] = {c: 40 + i for i, c in enumerate(_ORDER)}
+    _BRIGHT_FG: dict[str, int] = {c: 90 + i for i, c in enumerate(_ORDER)}
+    _BRIGHT_BG: dict[str, int] = {c: 100 + i for i, c in enumerate(_ORDER)}
 
     def __init__(self, bright: bool = False) -> None:
         """
@@ -130,6 +126,7 @@ class Colored_output:
         return f"{escape}{text}{self._RESET}"
     
 default_colored_output = Colored_output(bright=False) # shared instance used for every output of this module
+dco = default_colored_output # shorthand notation for default colored output used in this file
 
 class Line_counter:
     _printed_lines = 0
@@ -248,8 +245,8 @@ def print_selections(prompt: Prompt, options: Sequence[Option]) -> str:
     target_w: int = max(display_width(str(option['text'])) for option in options)
     target_w = 10 if target_w < 10 else target_w
 
-    if not callable(prompt): default_colored_output.print(prompt, color='white')
-    else: default_colored_output.print(prompt(), color='white')
+    if not callable(prompt): default_colored_output.print(prompt, color=dco.colors.white)
+    else: default_colored_output.print(prompt(), color=dco.colors.white)
 
     def print_options() -> None:
         for idx, option in enumerate(options):
@@ -257,15 +254,15 @@ def print_selections(prompt: Prompt, options: Sequence[Option]) -> str:
             lag_cursor: str = "·<" if idx == active_index else " "
 
             text: str = option['text']
-            color: str = option.get('color') or 'white'
+            color: str = option.get('color') or dco.colors.white
 
             current_w = display_width(text)
             filler: str = ('·' if active_index == idx else " ") * (max((target_w - current_w), 0) + 4 - display_width(lead_cursor))
 
-            default_colored_output.print(' '*(4 - display_width(lead_cursor)), color='white', end='', flush=True)
-            default_colored_output.print(f"{lead_cursor}", color='white', end='', flush=True)
+            default_colored_output.print(' '*(4 - display_width(lead_cursor)), color=dco.colors.white, end='', flush=True)
+            default_colored_output.print(f"{lead_cursor}", color=dco.colors.white, end='', flush=True)
             default_colored_output.print(f"{idx+1}.{text}", color=color, end='', flush=True)
-            default_colored_output.print(f"{filler}{lag_cursor}", color='white', flush=True)
+            default_colored_output.print(f"{filler}{lag_cursor}", color=dco.colors.white, flush=True)
 
     hide_cursor()
     # Print menu
@@ -342,14 +339,17 @@ def menu(name: str, prompt: Prompt, options: Sequence[Option] | None = None, hom
 
     while True:
         clear_screen()
-        if not home:
-            print_header(name)
-        else:
-            print_banner(name)
-        if not callable(prompt): default_colored_output.print(prompt, color='white')
-        else: default_colored_output.print(prompt(), color='white')
+        
+        # Titles
+        if not home: print_header(name)
+        else: print_banner(name)
+        
+        # Prompts
+        if not callable(prompt): default_colored_output.print(prompt, color=dco.colors.white)
+        else: default_colored_output.print(prompt(), color=dco.colors.white)
         default_colored_output.print()
 
+        #Selections
         chosen_id = print_selections(
             f'Choose from the following {len(menu_options)} options:', 
             menu_options
@@ -408,8 +408,8 @@ def home_menu(name: str, prompt: Prompt, options: Sequence[Option] | None = None
 
 def quit_program(code: int = 0) -> NoReturn:
     clear_screen()
-    default_colored_output.print("Exiting program.", color='white')
-    default_colored_output.print('='*30, color='white')
+    default_colored_output.print("Exiting program.", color=dco.colors.white)
+    default_colored_output.print('='*30, color=dco.colors.white)
     
     try: keyboard.unhook_all()
     except: pass
@@ -477,7 +477,7 @@ def select_folder(prompt: str = "select folder") -> str | None:
     MAX_FNAME_LEN = 30
     while True:
         default_line_counter.reset()
-        default_colored_output.print(prompt, color="white", end=": ", flush=True)
+        default_colored_output.print(prompt, color=dco.colors.white, end=": ", flush=True)
         folder = select_folder_window()
         if folder is not None:
             # a folder is a single path string, joining it would split it into characters
@@ -488,7 +488,7 @@ def select_folder(prompt: str = "select folder") -> str | None:
             else:
                 clear_lines(default_line_counter.printed_lines())
         else:
-            default_colored_output.print("Selection aborted.", color="white")
+            default_colored_output.print("Selection aborted.", color=dco.colors.white)
             return None
 
 
@@ -504,15 +504,13 @@ def select_files(prompt: str = "Select file(s)", file_types: str | Sequence[str]
     MAX_FNAME_LEN = 20
     while True:
         default_line_counter.reset()
-        default_colored_output.print(prompt, color="white", end=": ", flush=True)
+        default_colored_output.print(prompt, color=dco.colors.white, end=": ", flush=True)
         files = select_files_window(file_types)
         if files is not None:
             from pathlib import Path
-            preview = ", ".join(
-                [Path(f).name[:MAX_FNAME_LEN] + "..." if len(Path(f).name) > MAX_FNAME_LEN else Path(f).name 
-                for f in files]
-                )
-            default_colored_output.print(preview, color="white", flush=True)
+            filenames = [Path(f).name for f in files]
+            preview = ", ".join([name[:MAX_FNAME_LEN] + "..." if len(name) > MAX_FNAME_LEN else name for name in filenames])
+            default_colored_output.print(preview, color=dco.colors.white, flush=True)
             answer = print_yesorno("Is this correct?")
             if answer == 'y':
                 return files

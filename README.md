@@ -87,6 +87,19 @@ bright_output.print("Critical error in bright red", color="red")
 tag = default_colored_output.get_print_string_text("[OK]", color="green")
 ```
 
+Instead of typing the color name as a plain string, you can use the `colors` enum, which is reached through a `Colored_output` instance so the names stay scoped to the output they belong to:
+
+```python
+from prettier_console import default_colored_output as out
+
+out.print("Build succeeded", color=out.colors.green)
+out.print("Warning: low disk space", color=out.colors.yellow, background=out.colors.black)
+```
+
+The members are ordinary strings, so `out.colors.green` and `"green"` are interchangeable everywhere a `color` or `background` is accepted — including the `"color"` key of a menu option. Prefer the enum when you want your editor to autocomplete the names and flag a typo that a plain string would silently swallow.
+
+> `colors` is reached through a `Colored_output` instance, not imported on its own, so the color names stay scoped to the output that renders them. See [`default_colored_output.colors`](#instances-with-prettier_console) for the full list.
+
 ### Customizing the print of ascii art banners and headers
 
 ```python
@@ -359,7 +372,7 @@ import prettier_console.prettier_console as pc
 
 | Function | Description |
 |---|---|
-| `Colored_output(bright=False)` | Class for producing ANSI-colored output. |
+| `Colored_output(bright=False)` | Class for producing ANSI-colored output. Carries the `colors` enum of accepted color names, reached through an instance (see [`default_colored_output.colors`](#instances-with-prettier_console)). |
 | `Line_counter()` | Class tracking how many lines have been printed. You rarely need your own — use the shared `default_line_counter` instance below. |
 | `display_width(text)` | Display width of a string, counting CJK characters as 2. |
 | `safe_input(prompt="")` | `input()` replacement resilient to buffered keypresses. |
@@ -424,6 +437,33 @@ pc.<instance1>.<member_function>()
 | `default_colored_output.get_print_string_text(*objects, sep=" ", color=None, background=None)` | Same rendering, but returns the escaped string instead of printing it — for embedding a colored fragment inside a larger message. Note `color` defaults to `None` here, not `"white"`, so the default output carries no color code. |
 
 Valid `color` and `background` values are `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan` and `white`; an unrecognized name is ignored rather than raising. Build your own instance with `Colored_output(bright=True)` for the bright variants of the same eight.
+
+**`default_colored_output.colors`**
+
+The same eight names as an enum, so your editor can autocomplete them and a typo fails loudly instead of quietly printing uncolored text.
+
+| Member | Member | Member | Member |
+|---|---|---|---|
+| `colors.black` | `colors.red` | `colors.green` | `colors.yellow` |
+| `colors.blue` | `colors.magenta` | `colors.cyan` | `colors.white` |
+
+
+```python
+import prettier_console as pc
+
+pc.default_colored_output.print("done", color=pc.default_colored_output.colors.green)
+
+# your own instances carry it too — same eight names, rendered bright
+bright = pc.Colored_output(bright=True)
+bright.print("done", color=bright.colors.green)
+```
+
+It is reached through a `Colored_output` (the shared `default_colored_output`, or one you built), never imported on its own — that keeps the color names scoped to the output object that renders them. Notes:
+
+- Members are `str` subclasses, so they are accepted anywhere a color string is: `colors.green`, `"green"` and `"GREEN"` all produce the same escape, because the renderer upper-cases whatever it is given.
+- Comparison is against the member's value, which is upper-case: `colors.green == "GREEN"` is `True` but `colors.green == "green"` is `False`. Compare against `colors.green` itself rather than a lower-case literal.
+- Members are read-only. Assigning to one, to its `.value`, or deleting it raises `AttributeError`, so the palette cannot be redefined out from under the renderer.
+- Whether a member renders normal or bright is decided by the instance you reach it through, not by the member — the enum names the color, the instance names the intensity.
 
 Only `print()` touches the shared `default_line_counter`, and only when `file` is `None` or `sys.stdout` — redirecting to another stream leaves the count alone. `get_print_string_text()` never counts, since it prints nothing.
 
